@@ -7,6 +7,9 @@ import CategoryNav from '@/components/CategoryNav';
 import SmartSearch from '@/components/SmartSearch';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * Saudi Luxury Store - Editorial Homepage (Artistic Motion Edition)
  * الإخراج الحركي الفني (Rashof/Asali Style) مع تأثيرات بارالاكس سينمائية ومعدل تمرير فائق النعومة.
