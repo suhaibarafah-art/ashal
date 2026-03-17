@@ -116,7 +116,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-16">
             {mockProducts.map((product, index) => (
               <MotionFadeIn key={product.id} delay={0.1 * (index % 4)} yOffset={40}>
-                <div className="group cursor-pointer flex flex-col h-full">
+                <Link href={`/products/${product.id}`} className="group cursor-pointer flex flex-col h-full">
                   {/* Image Container - Magnetic slow zoom */}
                   <div className="relative aspect-[3/4] w-full mb-6 overflow-hidden bg-[#F5F5F5]">
                     <motion.div
@@ -127,14 +127,20 @@ export default function Home() {
                     />
                     
                     {/* Floating Add to Wishlist Button */}
-                    <button className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:scale-110 shadow-sm">
+                    <button 
+                      className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:scale-110 shadow-sm"
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent navigating to product page when clicking wishlist
+                        // TODO: Add to wishlist logic
+                      }}
+                    >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </button>
                   </div>
 
                   {/* Product Details - Stark Minimalist */}
                   <div className="px-1 text-center md:text-right flex flex-col flex-1">
-                    <h4 className="text-[13px] font-bold text-black uppercase tracking-widest mb-2 font-arabic-heading">
+                    <h4 className="text-[13px] font-bold text-black uppercase tracking-widest mb-2 font-arabic-heading group-hover:underline decoration-1 underline-offset-4">
                       {product.titleAr}
                     </h4>
                     <p className="text-[11px] text-[#777] font-light mb-4 line-clamp-1">
@@ -146,7 +152,7 @@ export default function Home() {
                        </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               </MotionFadeIn>
             ))}
           </div>
