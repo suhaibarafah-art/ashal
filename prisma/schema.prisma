@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. عراف الهبّة (The Predictive Oracle)
+model PredictiveOracle {
+  id              String   @id @default(uuid())
+  keyword         String   @unique
+  source          String   // e.g., Pinterest, Xiaohongshu, Reddit
+  saudiRelevance  Float    // Score 0.0 to 1.0 mapping global to local trend
+  ctrTestResult   Float?   // Click-through rate from the auto $5 Meta test
+  status          String   @default("TESTING") // TESTING, APPROVED, REJECTED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  products        Product[]
+}
+
+// 2. وكالة الإبداع الآلية (Virtual Influencers & Marketing)
+model AIInfluencerCampaign {
+  id              String   @id @default(uuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  aiModelType     String   // e.g., Saudi Male, Saudi Female (Virtual)
+  backgroundScene String   // e.g., Riyadh Majlis, AlUla Desert
+  generatedMedia  String? // Joined URLs or JSON string
+  platform        String   // Snapchat, TikTok, Meta
+  roas            Float    @default(0.0)
+  createdAt       DateTime @default(now())
+}
+
+// 3. محرك الثروة المستدامة (30-Year Wealth Engine)
+model WealthPortfolio {
+  id              String   @id @default(uuid())
+  date            DateTime @unique @default(now())
+  totalNetProfit  Float    // Net profit for the day ends in .99
+  
+  marketingReinvest Float  // 40%
+  longTermInvest    Float  // 40% (Stocks/Funds)
+  aiDevelopmentFund Float  // 20%
+  
+  wealthProjection30Y Float // The forecasted value over 30 years with compound interest
+  createdAt         DateTime @default(now())
+}
+
+// 4. العمليات اللوجستية السيادية (Self-Optimizing Logistics)
+model LogisticBot {
+  id              String   @id @default(uuid())
+  orderId         String   @unique
+  order           Order    @relation(fields: [orderId], references: [id])
+  chosenCourier   String   // Aramex, SMSA, DHL (dynamically chosen)
+  shippingCost    Float
+  whiteLabeled    Boolean  @default(true) // Custom packaging requested from supplier
+  returnRequested Boolean  @default(false)
+  autoRefunded    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+// 5. الفواتير الإلكترونية ZATCA (Official Saudi E-Invoicing)
+model EInvoiceZATCA {
+  id                  String   @id @default(uuid())
+  orderId             String   @unique
+  order               Order    @relation(fields: [orderId], references: [id])
+  cryptographicStamp  String   // ZATCA Phase 2 requirement (Hash)
+  qrCodeData          String   // Base64 TLV Encoded string for Saudi VAT
+  zatcaStatus         String   // CLEARED, REPORTED
+  issuedAt            DateTime @default(now())
+}
+
+// ----------------------------------------------------
+// Core Infrastructure (Products, Orders, Conversations)
+// ----------------------------------------------------
+
+model Product {
+  id              String   @id @default(uuid())
+  titleEn         String   @unique
+  titleAr         String   // Localized via Gemini API (Saudi luxury dialect)
+  descAr          String   // Luxury storytelling desc
+  baseCost        Float
+  shippingCost    Float
+  finalPrice      Float    // Price Engine Logic applied
+  
+  oracleId        String?
+  oracleReference PredictiveOracle? @relation(fields: [oracleId], references: [id])
+  
+  campaigns       AIInfluencerCampaign[]
+  orders          Order[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  customerPhone   String   // WhatsApp integration
+  customerCity    String
+  totalAmount     Float
+  paymentStatus   String   // Moyasar/ApplePay status
+  
+  logistics       LogisticBot?
+  zatcaInvoice    EInvoiceZATCA?
+  conversation    ConversationalSession?
+  
+  createdAt       DateTime @default(now())
+}
+
+// The Meta-Storefront (Voice-AI / Chatbot sessions)
+model ConversationalSession {
+  id              String   @id @default(uuid())
+  sessionId       String   @unique
+  orderId         String?  @unique
+  order           Order?   @relation(fields: [orderId], references: [id])
+  conversationLog String   // Stringified JSON
+  preferenceTags  String?  // Comma-separated tags
+  createdAt       DateTime @default(now())
+}
