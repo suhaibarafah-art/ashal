@@ -15,7 +15,7 @@ export class FulfillmentEngine {
     console.log(`📦 FulfillmentEngine: Processing Sovereign Order ${orderId}...`);
     
     const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order || order.status !== 'PAID') {
+    if (!order || order.paymentStatus !== 'PAID') {
         console.log("⚠️ FulfillmentEngine: Order not ready for fulfillment.");
         return;
     }
@@ -23,15 +23,15 @@ export class FulfillmentEngine {
     console.log(`📡 FulfillmentEngine: Transmitting to CJ Dropshipping...`);
     const result = await cjEngine.createOrder({
         externalId: order.id,
-        items: order.items,
-        shippingAddress: order.address
+        productId: order.productId,
+        customerCity: order.customerCity
     });
 
     if (result.success) {
         console.log(`✅ FulfillmentEngine: Order ${orderId} synched with CJ (ID: ${result.cjOrderId}).`);
         await prisma.order.update({
             where: { id: orderId },
-            data: { status: 'FULFILLING', supplierOrderId: result.cjOrderId }
+            data: { paymentStatus: 'FULFILLING' }
         });
     }
   }
