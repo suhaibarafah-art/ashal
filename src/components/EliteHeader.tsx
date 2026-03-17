@@ -5,17 +5,16 @@ import Link from 'next/link';
 import EliteCart from './EliteCart';
 
 /**
- * Saudi Luxury Store - Elite Header (Cinematic Transparent)
- * الترويسة النخبوية - شفافة بالكامل لدمجها مع الخلفية السينمائية.
+ * Saudi Luxury Store - Editorial Header
+ * الترويسة المكتومة - تصميم أبيض فائق النقاء مستوحى من الماركات العالمية.
  */
 export default function EliteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Add subtle blur only when scrolling down
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -24,36 +23,36 @@ export default function EliteHeader() {
   return (
     <>
       <header 
-        className={`fixed top-0 left-0 w-full z-[60] transition-all duration-700 ${
-          scrolled ? 'bg-[#020202]/80 backdrop-blur-2xl border-b border-white/[0.02] py-2' : 'bg-transparent py-6'
+        className={`fixed top-0 left-0 w-full z-[60] transition-all duration-300 bg-white ${
+          scrolled ? 'py-4 shadow-sm' : 'py-6 border-b border-[#EAEAEA]'
         }`}
       >
         <div className="container flex justify-between items-center px-4 md:px-12">
           {/* Logo */}
-          <Link href="/" className="group flex flex-col">
-            <h1 className="text-xl md:text-3xl font-light tracking-[0.3em] luxury-serif text-white group-hover:text-[#c5a975] transition-colors duration-500">
-              SOVEREIGN
+          <Link href="/" className="group flex flex-col items-center">
+            <h1 className="text-2xl md:text-4xl font-light tracking-[0.2em] luxury-serif text-black group-hover:opacity-70 transition-opacity duration-300 uppercase">
+              Ounass
             </h1>
-            <span className="text-[#999994] text-[8px] tracking-[0.5em] uppercase mt-1 opacity-60">Empire</span>
+            <span className="text-[#555] text-[7px] tracking-[0.6em] uppercase mt-2">Sovereign Edition</span>
           </Link>
 
           {/* Actions */}
-          <div className="flex items-center gap-8 md:gap-16">
-            <button className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#faf8f5] opacity-70 hover:opacity-100 hover:text-[#c5a975] transition-all duration-500 hidden md:block">
+          <div className="flex items-center gap-8 md:gap-12">
+            <button className="text-[10px] uppercase tracking-[0.2em] text-[#555] hover:text-black transition-colors duration-300 hidden md:block">
               Search
             </button>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="relative group py-2 flex items-center gap-3"
+              className="group py-2 flex items-center gap-2"
             >
-              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#faf8f5] opacity-70 group-hover:opacity-100 group-hover:text-[#c5a975] transition-all duration-500">
-                Cart
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#555] group-hover:text-black transition-colors duration-300">
+                Bag
               </span>
-              <div className="w-1.5 h-1.5 bg-[#c5a975] rounded-full animate-pulse" />
+              <div className="w-1.5 h-1.5 bg-black rounded-full" />
             </button>
-            <span className="w-px h-6 bg-white/10 hidden md:block" />
-            <Link href="/admin" className="text-[9px] uppercase tracking-[0.4em] text-[#999994] opacity-40 hover:opacity-100 hover:text-white transition-all duration-500 hidden md:block">
-              CEO Access
+            <span className="w-px h-4 bg-[#EAEAEA] hidden md:block" />
+            <Link href="/sohib-vision" className="text-[9px] uppercase tracking-[0.3em] text-[#999994] hover:text-black transition-colors duration-300 hidden md:block">
+              CEO
             </Link>
           </div>
         </div>
