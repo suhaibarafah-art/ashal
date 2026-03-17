@@ -11,9 +11,9 @@ import { motion } from 'framer-motion';
 // Replaces GlassCard - Clean, borderless or thin bordered white card
 export const EditorialCard: React.FC<{ children: React.ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
   <div 
-    className={`bg-white transition-all duration-700 ${className || ''}`}
+    className={`bg-[var(--bg-tertiary)] transition-all duration-700 ${className || ''}`}
     style={{
-      border: '1px solid #EAEAEA',
+      border: '1px solid var(--border-color)',
       padding: '2.5rem',
       ...style
     }}
@@ -30,7 +30,7 @@ export const EditorialLine = () => (
   <div style={{ 
     width: '1px', 
     height: '60px', 
-    background: '#000000', 
+    background: 'var(--accent-gold)', 
     margin: '2rem auto' 
   }} />
 );
@@ -57,29 +57,29 @@ export const SectionHeading: React.FC<{ title: string, subtitle?: string }> = ({
     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
     className="editorial-heading"
   >
-    {subtitle && <span className="text-[10px] uppercase tracking-[0.4em] text-[#999994] mb-4 block">{subtitle}</span>}
+    {subtitle && <span className="text-sm md:text-base uppercase tracking-[0.4em] text-[var(--accent-gold)] mb-4 block font-bold">{subtitle}</span>}
     <h2 className="luxury-serif">{title}</h2>
-    <div className="line" />
+    <div className="line" style={{ background: 'var(--accent-gold)' }} />
   </motion.div>
 );
 
 export const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
   // Editorial clean timer
   return (
-    <div className="flex gap-8 justify-center items-center font-serif text-black border border-[#EAEAEA] p-6 max-w-sm mx-auto bg-[#FAFAFA]">
+    <div className="flex gap-8 justify-center items-center font-serif text-[var(--text-primary)] border border-[var(--border-color)] p-6 max-w-sm mx-auto bg-[var(--bg-tertiary)]">
       <div className="flex flex-col items-center">
-        <span className="text-3xl font-light">02</span>
-        <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mt-2">Hours</span>
+        <span className="text-3xl md:text-4xl font-light">02</span>
+        <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)] mt-2">Hours</span>
       </div>
-      <span className="font-thin text-2xl mb-5 mx-2 text-[#EAEAEA]">|</span>
+      <span className="font-thin text-2xl mb-5 mx-2 text-[var(--border-dark)]">|</span>
       <div className="flex flex-col items-center">
-        <span className="text-3xl font-light">45</span>
-        <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mt-2">Mins</span>
+        <span className="text-3xl md:text-4xl font-light">45</span>
+        <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)] mt-2">Mins</span>
       </div>
-      <span className="font-thin text-2xl mb-5 mx-2 text-[#EAEAEA]">|</span>
+      <span className="font-thin text-2xl mb-5 mx-2 text-[var(--border-dark)]">|</span>
       <div className="flex flex-col items-center">
-        <span className="text-3xl font-light">12</span>
-        <span className="text-[9px] uppercase tracking-[0.3em] text-[#555] mt-2">Secs</span>
+        <span className="text-3xl md:text-4xl font-light">12</span>
+        <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[var(--text-secondary)] mt-2">Secs</span>
       </div>
     </div>
   );

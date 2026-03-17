@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  /* Ultra-Premium Ounass-Killer Light Palette */
-  --bg-primary: #FFFFFF; /* Pure crisp white */
-  --bg-secondary: #FAFAFA; /* Alabaster off-white for subtle contrast */
-  --bg-tertiary: #F5F5F5; /* Light gray for image backgrounds */
+  /* The Sovereign Empire - Absolute Luxury Palette */
+  --bg-primary: #121212; /* Matte Black */
+  --bg-secondary: #0A0A0A; /* Deep Onyx */
+  --bg-tertiary: #1A1A1A; /* Elevated Black */
   
-  --accent-gold: #C5A975; /* Subdued Champagne Gold for subtle luxury accents */
-  --accent-gold-bright: #D4AF37; 
-  --accent-gold-muted: rgba(197, 169, 117, 0.15);
+  --accent-gold: #D4AF37; /* Royal Oryx Gold */
+  --accent-gold-bright: #F9DA78; 
+  --accent-gold-muted: rgba(212, 175, 55, 0.15);
   
-  --text-primary: #000000; /* Pitch Black for high contrast editorial look */
-  --text-secondary: #555555; /* Refined Charcoal Grey for descriptions */
-  --text-tertiary: #999994; /* Light Grey for meta text */
+  --text-primary: #F5F5F5; /* Ivory White for high readability */
+  --text-secondary: #AAAAAA; /* Silver Grey for descriptions */
+  --text-tertiary: #777777; /* Anthracite for meta text */
   
-  --border-color: #EAEAEA; /* Crisp, thin editorial border */
-  --border-dark: #222222; /* High contrast border for hover states */
+  --border-color: #333333; /* Dark clean borders */
+  --border-dark: #444444; 
   
-  /* Typography Tokens - Spaced for Luxury */
+  /* Typography Tokens - Bold and Large */
   --font-serif: var(--font-playfair), "Times New Roman", serif;
   --font-arabic-heading: var(--font-cairo), sans-serif;
-  --font-arabic-body: var(--font-inter), sans-serif;
+  --font-arabic-body: var(--font-cairo), sans-serif;
   
   /* Refined, Slower Animations */
   --transition-luxury: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -35,13 +35,14 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 18px; /* Base size up by default */
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-arabic-body);
-  line-height: 1.6;
+  line-height: 1.8;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -49,13 +50,13 @@ body {
 
 h1, h2, h3, .logo {
   font-family: var(--font-arabic-heading);
-  font-weight: 300;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .luxury-serif {
   font-family: var(--font-serif);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
 }
 
 a {
