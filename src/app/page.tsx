@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { SectionHeading, CountdownTimer, MotionFadeIn } from '@/components/DesignSystem';
 import Link from 'next/link';
 import CategoryNav from '@/components/CategoryNav';
@@ -9,24 +9,32 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 /**
  * Saudi Luxury Store - Editorial Homepage (Artistic Motion Edition)
- * الإخراج الحركي الفني (Rashof/Asali Style) مع تأثيرات بارالاكس سينمائية ومعدل تمرير فائق النعومة.
  */
-
-// Mock products (in production, fetch server-side and pass as props to this client component, or split into Client/Server components)
-const mockProducts = [
-  { id: 1, titleAr: 'حقيبة كلاسيك', descAr: 'جلد إيطالي نقي مع تفاصيل ذهبية', finalPrice: '8,450', img: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80' },
-  { id: 2, titleAr: 'حذاء كعب عالي', descAr: 'تصميم أنيق للسهرات والمناسبات', finalPrice: '3,200', img: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&q=80' },
-  { id: 3, titleAr: 'عطر السيادة', descAr: 'مزيج العود الملكي مع روز داماس', finalPrice: '1,850', img: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&q=80' },
-  { id: 4, titleAr: 'ساعة أوتوماتيك', descAr: 'هيكل معدني مصقول بدقة سويسرية', finalPrice: '24,000', img: 'https://images.unsplash.com/photo-1599643478514-4a820c56a8cc?auto=format&fit=crop&q=80' },
-  { id: 5, titleAr: 'قلادة ماسية', descAr: 'ذهب أبيض عيار 18 مع ماس نقي', finalPrice: '15,600', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80' },
-  { id: 6, titleAr: 'نظارة شمسية', descAr: 'تصميم آفييتور عصري مع حماية UV', finalPrice: '1,450', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80' },
-  { id: 7, titleAr: 'محفظة جلدية', descAr: 'صناعة يدوية دقيقة ومساحات ذكية', finalPrice: '980', img: 'https://images.unsplash.com/photo-1600185906355-6c703e2e8e97?auto=format&fit=crop&q=80' },
-  { id: 8, titleAr: 'طقم مجوهرات', descAr: 'مجموعة متكاملة لإطلالة تسلب الألباب', finalPrice: '32,000', img: 'https://images.unsplash.com/photo-1550592704-6c76defa99ce?auto=format&fit=crop&q=80' },
-];
 
 export default function Home() {
   const heroRef = useRef(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
+  // Fetch real products from DB
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          // Take top 8 products for the homepage
+          setProducts(data.slice(0, 8));
+        }
+      } catch (error) {
+        console.error("Failed to load products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, []);
+
   // Parallax scroll effects for Hero
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
@@ -110,49 +118,59 @@ export default function Home() {
         <div className="container">
           <SectionHeading title="أحدث الإصدارات" subtitle="Just Landed" />
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-16 mt-16">
-            {mockProducts.map((product, index) => (
-              <MotionFadeIn key={product.id} delay={0.1 * (index % 4)} yOffset={40}>
-                <Link href={`/products/${product.id}`} className="group cursor-pointer flex flex-col h-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-sm overflow-hidden hover:border-[var(--accent-gold)] transition-colors duration-500">
-                  {/* Image Container - Magnetic slow zoom */}
-                  <div className="relative aspect-[3/4] w-full border-b border-[var(--border-color)] overflow-hidden">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{ backgroundImage: `url(${product.img})` }}
-                    />
-                    
-                    {/* Floating Add to Wishlist Button */}
-                    <button 
-                      className="absolute top-4 right-4 w-10 h-10 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:border-[var(--accent-gold)] shadow-lg"
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent navigating to product page when clicking wishlist
-                        // TODO: Add to wishlist logic
-                      }}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </button>
-                  </div>
-
-                  {/* Product Details - Stark Minimalist */}
-                  <div className="p-6 text-center md:text-right flex flex-col flex-1">
-                    <h4 className="text-lg md:text-xl font-bold text-[var(--accent-gold)] uppercase tracking-widest mb-2 font-arabic-heading group-hover:underline decoration-1 underline-offset-4">
-                      {product.titleAr}
-                    </h4>
-                    <p className="text-sm md:text-base text-[var(--text-secondary)] font-light mb-4 line-clamp-2">
-                      {product.descAr}
-                    </p>
-                    <div className="mt-auto pt-4 border-t border-[var(--border-color)]">
-                       <span className="text-xl md:text-2xl text-[var(--text-primary)] font-bold tracking-wider">
-                        SAR {product.finalPrice}
-                       </span>
+          {loading ? (
+             <div className="flex justify-center items-center py-32">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent-gold)]"></div>
+             </div>
+          ) : products.length === 0 ? (
+             <div className="text-center py-32 text-[var(--text-secondary)] font-light">
+               لم يتم العثور على منتجات في قاعدة البيانات. سيقوم النظام بملء المتجر قريباً.
+             </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-16 mt-16">
+              {products.map((product: any, index: number) => (
+                <MotionFadeIn key={product.id} delay={0.1 * (index % 4)} yOffset={40}>
+                  <Link href={`/products/${product.id}`} className="group cursor-pointer flex flex-col h-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-sm overflow-hidden hover:border-[var(--accent-gold)] transition-colors duration-500">
+                    {/* Image Container - Magnetic slow zoom */}
+                    <div className="relative aspect-[3/4] w-full border-b border-[var(--border-color)] overflow-hidden">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute inset-0 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80'})` }}
+                      />
+                      
+                      {/* Floating Add to Wishlist Button */}
+                      <button 
+                        className="absolute top-4 right-4 w-10 h-10 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:border-[var(--accent-gold)] shadow-lg"
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevent navigating to product page when clicking wishlist
+                          // TODO: Add to wishlist logic
+                        }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                      </button>
                     </div>
-                  </div>
-                </Link>
-              </MotionFadeIn>
-            ))}
-          </div>
+
+                    {/* Product Details - Stark Minimalist */}
+                    <div className="p-6 text-center md:text-right flex flex-col flex-1">
+                      <h4 className="text-lg md:text-xl font-bold text-[var(--accent-gold)] uppercase tracking-widest mb-2 font-arabic-heading group-hover:underline decoration-1 underline-offset-4 line-clamp-1">
+                        {product.nameAr || product.name || 'منتج حصري'}
+                      </h4>
+                      <p className="text-sm md:text-base text-[var(--text-secondary)] font-light mb-4 line-clamp-2">
+                        {product.descriptionAr || 'قطعة فريدة تجسد الفخامة المطلقة'}
+                      </p>
+                      <div className="mt-auto pt-4 border-t border-[var(--border-color)]">
+                         <span className="text-xl md:text-2xl text-[var(--text-primary)] font-bold tracking-wider">
+                          SAR {product.price?.toString() || '0.00'}
+                         </span>
+                      </div>
+                    </div>
+                  </Link>
+                </MotionFadeIn>
+              ))}
+            </div>
+          )}
 
           <MotionFadeIn delay={0.3} yOffset={30} className="flex justify-center mt-20">
              <Link href="/shop">

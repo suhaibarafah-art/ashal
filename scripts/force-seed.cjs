@@ -1,10 +1,6 @@
-/**
- * Saudi Luxury Store - Empire Catalog Seeder
- * محرك التوسعة الإمبراطورية - ملأ المتجر بـ 20 منتجاً 'هبّة' آلياً.
- */
+const { PrismaClient } = require('@prisma/client');
 
-import { prisma } from './prisma';
-import { calculateDynamicPrice } from './pricing-engine';
+const prisma = new PrismaClient();
 
 const EMPIRE_TRENDS = [
   { en: "Elite Oud Diffuser", ar: "فواحة العود الملكية الذكية", cost: 120, shipping: 25, materials: "رخام، خشب الأبنوس، نحاس", care: "تنظيف جاف بقطعة قماش ناعمة", img: "https://images.unsplash.com/photo-1606105001374-e883833b5cda?auto=format&fit=crop&q=80" },
@@ -29,41 +25,61 @@ const EMPIRE_TRENDS = [
   { en: "Nomad Copper Tray", ar: "صينية نحاس 'نوماد' عتيقة", cost: 75, shipping: 25, materials: "نحاس أحمر مطروق يدوياً", care: "تلميع دوري بمنظف النحاس", img: "https://images.unsplash.com/photo-1626025219213-aa77eb48a609?auto=format&fit=crop&q=80" }
 ];
 
-export class EmpireSeeder {
-  static async seedEmpireCatalog() {
-    console.log("🏛️ EmpireSeeder: Initiating sovereign catalog expansion (20 Products)...");
-    
-    let seededCount = 0;
-    for (const t of EMPIRE_TRENDS) {
-      const metrics = { 
-        demandScore: 0.8 + Math.random() * 0.2, 
-        supplierStock: 100, 
-        recentSalesCount: 50 
-      };
-      
-      const finalPrice = calculateDynamicPrice(t.cost, t.shipping, metrics);
-
-      await prisma.product.upsert({
-        where: { titleEn: t.en },
-        update: { 
-          finalPrice: finalPrice,
-          image: t.img
-        },
-        create: {
-          titleEn: t.en,
-          titleAr: t.ar,
-          descAr: `استمتع بالفخامة المطلقة مع ${t.ar}. تم اختياره بعناية ليلائم ذوق النخبة السعودية في عام 2026. جودة لا تُضاهى وتصميم يجسد هويتنا العريقة بلمسة عصرية عالمية.\n\nالمواد المستخدمة: ${t.materials}\nتعليمات العناية: ${t.care}`,
-          baseCost: t.cost,
-          shippingCost: t.shipping,
-          finalPrice: finalPrice,
-          image: t.img,
-          category: 'السيادة (المختارات الملكية)'
-        }
-      });
-      seededCount++;
-    }
-    
-    console.log(`✅ EmpireSeeder: ${seededCount} Sovereign products seeded.`);
-    return seededCount;
-  }
+function calculateDynamicPrice(baseCost, shippingCost, metrics) {
+  const totalCost = baseCost + shippingCost;
+  const minimumMarginPercent = 0.50; // 50% Net Margin target
+  
+  let targetPrice = totalCost / (1 - minimumMarginPercent);
+  
+  const scd = metrics.demandScore || 0.5;
+  const volatilityPremium = 1 + (scd * 0.3);
+  
+  targetPrice = targetPrice * volatilityPremium;
+  return Math.ceil(targetPrice / 10) * 10 - 1; 
 }
+
+async function seed() {
+  console.log("🔥 Direct DB Push: Populating live Supabase/Vercel Database!");
+  let seededCount = 0;
+  for (const t of EMPIRE_TRENDS) {
+    const metrics = { 
+      demandScore: 0.8 + Math.random() * 0.2, 
+      supplierStock: 100, 
+      recentSalesCount: 50 
+    };
+    
+    const finalPrice = calculateDynamicPrice(t.cost, t.shipping, metrics);
+
+    await prisma.product.upsert({
+      where: { titleEn: t.en },
+      update: { 
+        finalPrice: finalPrice,
+        image: t.img
+      },
+      create: {
+        titleEn: t.en,
+        titleAr: t.ar,
+        descAr: `استمتع بالفخامة المطلقة مع ${t.ar}. تم اختياره بعناية ليلائم ذوق النخبة السعودية في عام 2026. جودة لا تُضاهى وتصميم يجسد هويتنا العريقة بلمسة عصرية عالمية.\n\nالمواد المستخدمة: ${t.materials}\nتعليمات العناية: ${t.care}`,
+        baseCost: t.cost,
+        shippingCost: t.shipping,
+        finalPrice: finalPrice,
+        image: t.img,
+        category: 'السيادة (المختارات الملكية)'
+      }
+    });
+
+    seededCount++;
+    console.log(`✅ Seeded: ${t.ar}`);
+  }
+  
+  console.log(`🚀 Successfully seeded ${seededCount} luxury items directly to DB.`);
+}
+
+seed()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
