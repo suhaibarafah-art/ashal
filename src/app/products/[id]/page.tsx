@@ -28,7 +28,17 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
   // Calculate Loyalty Points (10% of value as points, arbitrary ratio)
   const loyaltyPoints = Math.floor(product.finalPrice * 0.1);
-  const gallery = product.images ? JSON.parse(product.images) : [product.image];
+  
+  let gallery = [];
+  try {
+    gallery = product.images ? JSON.parse(product.images) : [];
+    if (!Array.isArray(gallery)) gallery = [product.image].filter(Boolean);
+  } catch (e) {
+    // If it fails to parse (e.g. it's just a raw URL string), fallback to the single image
+    gallery = [product.image || product.images].filter(Boolean);
+  }
+  
+  if (gallery.length === 0) gallery = ['https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80']; // Final fallback
 
   return (
     <main className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-arabic-body selection:bg-[var(--accent-gold)] selection:text-black mt-[80px]">
