@@ -22,6 +22,9 @@ export const EditorialCard: React.FC<{ children: React.ReactNode, className?: st
   </div>
 );
 
+// Alias for backwards compatibility with older Sovereign components
+export const GlassCard = EditorialCard;
+
 // Replaces GoldLine - Thin black editorial line
 export const EditorialLine = () => (
   <div style={{ 

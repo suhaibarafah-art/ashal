@@ -1,51 +1,48 @@
-'use client';
-
-import React from 'react';
 import Link from 'next/link';
 
-/**
- * Saudi Luxury Store - Empire Footer
- * تذييل الموقع الإمبراطوري - يجمع بين الجمال والروابط الاستراتيجية.
- */
 export default function EmpireFooter() {
   return (
-    <footer className="bg-[#050505] border-t border-[#b38b4d]/10 py-20 px-12 font-serif">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-        <div className="max-w-sm">
-          <h3 className="text-2xl font-light text-[#f8f6f2] mb-6 tracking-tighter uppercase">Saudi <span className="text-[#b38b4d]">Luxury</span></h3>
-          <p className="text-sm text-gray-500 leading-relaxed mb-8">
-            صناعة الفخامة الرقمية في قلب المملكة. نحن نمزج بين عراقة التراث السعودي وابتكار المستقبل السيادي لعام 2026.
+    <footer className="w-full bg-[var(--bg-secondary)] border-t border-[var(--border-color)] pt-16 pb-8 mt-auto px-5 lg:px-20 text-center md:text-right font-arabic-body">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div className="col-span-1 md:col-span-2 text-center md:text-right">
+          <h2 className="text-3xl font-serif text-[var(--accent-gold)] tracking-widest mb-6">SOVEREIGN EMPIRE</h2>
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed max-w-sm font-light mx-auto md:mx-0">
+            الوجهة الأولى للنخبة في المملكة العربية السعودية. ننتقي أدق تفاصيل الفخامة لنضعها بين يديك بأعلى معايير الخدمة والموثوقية.
           </p>
         </div>
-
-        <div className="grid grid-cols-2 gap-16">
-          <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#b38b4d] mb-6">الكيان</h4>
-            <ul className="space-y-4 text-xs text-gray-400">
-              <li><Link href="/" className="hover:text-[#f8f6f2] transition-colors">الواجهة الرئيسية</Link></li>
-              <li><Link href="/collections" className="hover:text-[#f8f6f2] transition-colors">المجموعات الملكية</Link></li>
-              <li><Link href="/admin/empire" className="hover:text-[#f8f6f2] transition-colors">رادار الإمبراطورية</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#b38b4d] mb-6">السيادة</h4>
-            <ul className="space-y-4 text-xs text-gray-400">
-              <li><Link href="/legal" className="hover:text-[#f8f6f2] transition-colors">الشروط والخصوصية</Link></li>
-              <li><Link href="/legal" className="hover:text-[#f8f6f2] transition-colors">سياسة الاسترجاع</Link></li>
-              <li><Link href="/contact" className="hover:text-[#f8f6f2] transition-colors">تواصل النخبة</Link></li>
-            </ul>
+        
+        <div className="text-center md:text-right">
+          <h4 className="font-bold text-[var(--accent-gold)] mb-6 uppercase tracking-wider text-sm font-arabic-heading">السيادة القانونية</h4>
+          <ul className="space-y-4 text-sm text-[var(--text-secondary)]">
+            <li><Link href="/return-policy" className="hover:text-[var(--accent-gold)] transition">سياسة الاسترجاع (7 أيام)</Link></li>
+            <li><Link href="/shipping-policy" className="hover:text-[var(--accent-gold)] transition">سياسة الشحن والتوصيل</Link></li>
+            <li><Link href="/terms" className="hover:text-[var(--accent-gold)] transition">الشروط والأحكام</Link></li>
+            <li><Link href="/privacy" className="hover:text-[var(--accent-gold)] transition">الخصوصية وسرية البيانات</Link></li>
+          </ul>
+        </div>
+        
+        <div className="text-center md:text-right">
+          <h4 className="font-bold text-[var(--accent-gold)] mb-6 uppercase tracking-wider text-sm font-arabic-heading">الموثوقية الرسمية</h4>
+          <div className="space-y-4">
+            <div className="bg-[var(--bg-primary)] p-4 rounded-lg flex items-center justify-between border border-[var(--border-color)]">
+              <span className="text-xs text-[var(--text-tertiary)]">السجل التجاري</span>
+              <span className="text-sm text-white font-mono">1010893321</span>
+            </div>
+            <div className="bg-[var(--bg-primary)] p-4 rounded-lg flex items-center justify-between border border-[var(--border-color)]">
+              <span className="text-xs text-[var(--text-tertiary)] ml-2">الرقم الضريبي (ZATCA)</span>
+              <span className="text-sm text-white font-mono">300582910300003</span>
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p className="text-[10px] text-gray-600 tracking-widest uppercase">
-          © 2026 Saudi Luxury Store | Antigravity Protocol Activated
-        </p>
-        <div className="flex gap-4">
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]/40"></span>
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]"></span>
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]/40"></span>
+      
+      <div className="container mx-auto border-t border-[var(--border-color)] pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[var(--text-tertiary)]">
+        <p>&copy; {new Date().getFullYear()} Sovereign Empire Inc. جميع الحقوق محفوظة لكيان السيادة.</p>
+        <div className="flex gap-4 opacity-70 items-center justify-center">
+          <span className="font-sans font-bold text-[10px] tracking-widest uppercase">Apple Pay</span>
+          <span className="font-sans font-bold text-[10px] tracking-widest uppercase">Mada</span>
+          <span className="font-sans font-bold text-[10px] tracking-widest uppercase">Visa</span>
+          <span className="font-sans font-bold text-[10px] tracking-widest uppercase">Mastercard</span>
         </div>
       </div>
     </footer>

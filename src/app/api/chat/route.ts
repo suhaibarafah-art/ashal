@@ -1,39 +1,49 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
-import { simulateSaudiAiResponse } from "@/lib/ai-simulation";
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const prisma = new PrismaClient();
 
+/**
+ * 🤖 The Sovereign Empire - AI Concierge (Customer Service)
+ * Responds to natural language queries regarding tracking and products.
+ */
 export async function POST(req: Request) {
   try {
-    const { message } = await req.json();
+    const { message, customerPhone } = await req.json();
 
-    if (!genAI || !apiKey) {
-      const simulatedReply = await simulateSaudiAiResponse(message);
-      return NextResponse.json({ reply: simulatedReply });
+    if (!message || message.trim() === '') {
+      return NextResponse.json({ reply: 'عذراً طال عمرك، الرسالة فارغة. تفضل، كيف أقدر أخدمك اليوم؟' });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Keyword matching for Order Tracking
+    if (message.includes('شحنتي') || message.includes('طلبي') || message.includes('تتبع')) {
+       // Look up order by phone
+       if (!customerPhone) {
+          return NextResponse.json({ reply: 'أبشر يا غالي، لكن أحتاج رقم جوالك للبحث عن شحنتك الموقرة في النظام.' });
+       }
 
-    const prompt = `
-      أنت مساعد شخصي ذكي في متجر "الفخامة" (Saudi Luxury Store). 
-      تتحدث بلهجة سعودية "بيضاء" (راقية، مهذبة، وفخمة). 
-      تخاطب العميل بتقدير (يا هلا، طال عمرك، يا فندم، قائد العمليات، إلخ).
-      هدفنا هو تقديم تجربة تسوق نخبوية. 
-      إذا سألك العميل عن اقتراحات، اقترح له منتجات فخمة (مثل أبجورات كريستال، مباخر ذكية، ساعات فخمة).
+       const order = await prisma.order.findFirst({
+         where: { customerPhone },
+         include: { logistics: true }
+       });
 
-      المستخدم يقول: "${message}"
-    `;
+       if (!order) {
+          return NextResponse.json({ reply: 'أعتذر منك، لا يوجد طلب مرتبط بهذا الرقم. هل تأكدت من رقم الجوال المستخدم أثناء إتمام الدفع؟' });
+       }
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+       if (order.logistics) {
+          const courier = order.logistics.chosenCourier || 'شركة الشحن الحصرية';
+          return NextResponse.json({ reply: `طلبك الكريم رقم #${order.id.slice(-6).toUpperCase()} تم شحنه بواسطة ${courier}، وهو الآن في طريقه إليك. رفاهية الوصول قريبة!` });
+       } else {
+          return NextResponse.json({ reply: `طلبك الكريم رقم #${order.id.slice(-6).toUpperCase()} حالياً قيد التجهيز وسيتم تسليمه لشركة الشحن في أقرب وقت. شكراً لاختيارك السيادة.` });
+       }
+    }
 
-    return NextResponse.json({ reply: text });
+    // Default polite response (AI Fallback)
+    return NextResponse.json({ reply: 'أهلاً بك في إمبراطورية السيادة للفخامة. خدمة العملاء الآلية تحت أمرك. يسعدني الإجابة عن أي استفسار يخص طلباتك.' });
+
   } catch (error) {
-    console.error("Gemini Error:", error);
-    const fallbackReply = await simulateSaudiAiResponse("");
-    return NextResponse.json({ reply: fallbackReply });
+    console.error('AI Concierge Error:', error);
+    return NextResponse.json({ error: 'عذراً، حدث خطأ في النظام. يتم الآن إصلاحه.' }, { status: 500 });
   }
 }

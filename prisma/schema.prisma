@@ -84,6 +84,11 @@ model Product {
   shippingCost    Float
   finalPrice      Float    // Price Engine Logic applied
   
+  image           String?
+  images          String?
+  category        String?
+  supplier        String?
+  
   oracleId        String?
   oracleReference PredictiveOracle? @relation(fields: [oracleId], references: [id])
   
@@ -119,4 +124,17 @@ model ConversationalSession {
   conversationLog String   // Stringified JSON
   preferenceTags  String?  // Comma-separated tags
   createdAt       DateTime @default(now())
+}
+
+// Abandoned Cart Recovery System
+model AbandonedCart {
+  id           String    @id @default(uuid())
+  email        String?
+  phone        String?
+  cartData     String    // JSON representations of products
+  status       String    @default("pending") // pending, discount_sent, recovered
+  remindedAt   DateTime?
+  discountCode String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
