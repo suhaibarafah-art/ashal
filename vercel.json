@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/keep-alive",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/sync-trends",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/content",
+      "schedule": "0 12,20 * * *"
+    },
+    {
+      "path": "/api/cron/ads",
+      "schedule": "30 23 * * *"
+    }
+  ]
+}
