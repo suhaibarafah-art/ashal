@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/keep-alive",
+      "schedule": "*/10 * * * *"
+    },
+    {
       "path": "/api/cron/sync-trends",
       "schedule": "*/15 * * * *"
     },
