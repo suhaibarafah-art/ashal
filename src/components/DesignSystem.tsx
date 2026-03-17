@@ -1,9 +1,12 @@
 /**
  * Saudi Luxury Store - Editorial Design System ("The Ounass Killer")
- * نظام بصري يعتمد على الفخامة التحريرية النقية (Pure Minimalist Luxury).
+ * نظام بصري يعتمد على الفخامة التحريرية النقية مع تفاعلات حركية (Fluid Motion).
  */
 
+'use client';
+
 import React from 'react';
+import { motion } from 'framer-motion';
 
 // Replaces GlassCard - Clean, borderless or thin bordered white card
 export const EditorialCard: React.FC<{ children: React.ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
@@ -44,11 +47,17 @@ export const LuxuryButton: React.FC<{
 );
 
 export const SectionHeading: React.FC<{ title: string, subtitle?: string }> = ({ title, subtitle }) => (
-  <div className="editorial-heading">
+  <motion.div 
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-100px" }}
+    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+    className="editorial-heading"
+  >
     {subtitle && <span className="text-[10px] uppercase tracking-[0.4em] text-[#999994] mb-4 block">{subtitle}</span>}
     <h2 className="luxury-serif">{title}</h2>
     <div className="line" />
-  </div>
+  </motion.div>
 );
 
 export const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
@@ -72,3 +81,16 @@ export const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate })
     </div>
   );
 };
+
+// Fluid Reveal Wrapper for Staggered Animations
+export const MotionFadeIn: React.FC<{ children: React.ReactNode, delay?: number, yOffset?: number, className?: string }> = ({ children, delay = 0, yOffset = 50, className = '' }) => (
+  <motion.div
+    initial={{ opacity: 0, y: yOffset }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);

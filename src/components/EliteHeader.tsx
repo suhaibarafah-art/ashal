@@ -3,27 +3,38 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 /**
  * Saudi Luxury Store - Editorial Header
- * الترويسة المكتومة - تصميم أبيض فائق النقاء مستوحى من الماركات العالمية.
+ * الترويسة المكتومة - تصميم أبيض فائق النقاء مع حركة سينمائية (Hide on scroll down).
  */
 export default function EliteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest: number) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (latest > previous && latest > 150) {
+      setHidden(true); // Scrolling down - hide
+    } else {
+      setHidden(false); // Scrolling up - reveal
+    }
+    setScrolled(latest > 10);
+  });
 
   return (
     <>
-      <header 
-        className={`fixed top-0 left-0 w-full z-[60] transition-all duration-300 bg-white ${
+      <motion.header 
+        variants={{
+          visible: { y: 0 },
+          hidden: { y: "-100%" }
+        }}
+        animate={hidden ? "hidden" : "visible"}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 w-full z-[60] transition-colors duration-500 bg-white ${
           scrolled ? 'py-4 shadow-sm' : 'py-6 border-b border-[#EAEAEA]'
         }`}
       >
@@ -56,7 +67,7 @@ export default function EliteHeader() {
             </Link>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <EliteCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
