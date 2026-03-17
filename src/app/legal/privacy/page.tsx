@@ -1,29 +1,29 @@
-export default function PrivacyPolicy() {
+import React from 'react';
+import { GlassCard, SectionHeading } from '@/components/DesignSystem';
+
+export default function PrivacyPolicyPage() {
   return (
-    <div className="container" style={{ padding: '6rem 1.5rem', maxWidth: '800px', margin: '0 auto' }}>
-      <div className="glass-panel" style={{ padding: '3rem' }}>
-        <h1 style={{ color: 'var(--accent-gold)', marginBottom: '2rem', fontSize: '2.5rem' }}>سياسة الخصوصية وحماية البيانات</h1>
+    <main className="min-h-screen bg-[#020202] py-32 px-6">
+      <div className="container max-w-4xl mx-auto text-[#faf8f5]">
+        <SectionHeading title="سياسة الخصوصية" subtitle="Privacy Policy - ZATCA Compliant" />
         
-        <div style={{ color: 'var(--text-secondary)', lineHeight: '2' }}>
-          <p style={{ marginBottom: '1.5rem' }}>
-            خصوصيتك هي أولويتنا في <strong>الفخامة</strong>. توضح هذه السياسة كيفية جمع واستخدام وتخزين بياناتك الشخصية بناءً على القوانين والتشريعات الرقمية في المملكة العربية السعودية.
+        <GlassCard className="prose prose-invert max-w-none font-light leading-loose text-sm text-[#999994]">
+          <h2 className="text-[#c5a975] text-xl mb-4">1. التشفير السيادي للبيانات</h2>
+          <p className="mb-8">
+            في متجرنا، نتعامل مع بيانات عملائنا النخبة بأقصى درجات السرية. كافة بيانات الدفع مشفرة عبر قنوات اتصالات آمنة (SSL/TLS)، ولا نقوم بتخزين تفاصيل البطاقات الائتمانية على خوادمنا بل تتم معالجتها لحظياً عبر شريكنا المعتمد "ميسر" (Moyasar) وفقاً لمعايير مؤسسة النقد العربي السعودي (SAMA).
+          </p>
+          
+          <h2 className="text-[#c5a975] text-xl mb-4">2. التوافق مع وزارة التجارة و ZATCA</h2>
+          <p className="mb-8">
+            بصفتنا كياناً تجارياً مسجلاً ومعتمداً، نلتزم بمشاركة البيانات الضرورية فقط والخاصة بالفواتير الضريبية (E-Invoicing) لضمان الامتثال التام مع هيئة الزكاة والضريبة والجمارك (ZATCA). كافة الوثائق الصادرة مشفرة بختم رقمي آمن.
           </p>
 
-          <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>جمع المعلومات:</h3>
-          <p style={{ marginBottom: '1.5rem' }}>
-            نقوم بجمع المعلومات اللازمة فقط لإتمام عملية الطلب عبر منصتنا (كالاسم، رقم الجوال، العنوان)، بالإضافة إلى استخدام بعض البيانات التحليلية لتقديم تجربة تسوق مؤتمتة وتوصيات تلائم ذوقك الرفيع.
+          <h2 className="text-[#c5a975] text-xl mb-4">3. استخدام الذكاء الاصطناعي</h2>
+          <p className="mb-8">
+            نستخدم خوارزميات تحليل البيانات لتخصيص تجربة التصفح الخاصة بك (Personal Stylist AI). يتم معالجة تفضيلاتك محلياً لضمان عدم مشاركتها مع أطراف ثالثة لأغراض دعائية رخيصة. الفخامة تبدأ من احترام المساحة الشخصية.
           </p>
-
-          <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>مشاركة البيانات:</h3>
-          <p style={{ marginBottom: '1.5rem' }}>
-            لا نقوم أبداً ببيع بياناتك لأطراف خارجية. تتم مشاركة البيانات اللازمة كالعنوان مع (شركاء الشحن) ومعلومات الدفع المشفرة مع (بوابات الدفع المرخصة مثل ميسر) حصرياً.
-          </p>
-
-          <p style={{ marginTop: '2rem', color: 'var(--accent-gold)' }}>
-            نلتزم بتطبيق أحدث معايير الأمان لحماية بياناتك ولضمان سير عمليات التجارة الرقمية بسلاسة وأمان تام.
-          </p>
-        </div>
+        </GlassCard>
       </div>
-    </div>
+    </main>
   );
 }

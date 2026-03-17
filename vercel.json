@@ -2,19 +2,23 @@
   "crons": [
     {
       "path": "/api/cron/keep-alive",
-      "schedule": "0 * * * *"
+      "schedule": "*/10 * * * *"
     },
     {
       "path": "/api/cron/sync-trends",
-      "schedule": "0 2 * * *"
+      "schedule": "0 4 * * *"
     },
     {
       "path": "/api/cron/content",
-      "schedule": "0 12,20 * * *"
+      "schedule": "*/10 * * * *"
     },
     {
       "path": "/api/cron/ads",
-      "schedule": "30 23 * * *"
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/quality-control",
+      "schedule": "0 0 * * *"
     }
   ]
 }

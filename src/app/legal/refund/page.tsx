@@ -1,31 +1,24 @@
-export default function RefundPolicy() {
+import React from 'react';
+import { GlassCard, SectionHeading } from '@/components/DesignSystem';
+
+export default function RefundPage() {
   return (
-    <div className="container" style={{ padding: '6rem 1.5rem', maxWidth: '800px', margin: '0 auto' }}>
-      <div className="glass-panel" style={{ padding: '3rem' }}>
-        <h1 style={{ color: 'var(--accent-gold)', marginBottom: '2rem', fontSize: '2.5rem' }}>سياسة الاسترجاع والاستبدال</h1>
+    <main className="min-h-screen bg-[#020202] py-32 px-6">
+      <div className="container max-w-4xl mx-auto text-[#faf8f5]">
+        <SectionHeading title="الاسترجاع والاستبدال" subtitle="Refund Policy - ZATCA Compliant" />
         
-        <div style={{ color: 'var(--text-secondary)', lineHeight: '2' }}>
-          <p style={{ marginBottom: '1.5rem' }}>
-            مرحباً بك في منصة <strong>الفخامة</strong>. نحن نلتزم بتقديم أفضل جودة للمنتجات لعملائنا، وبما يتوافق مع أنظمة وزارة التجارة في المملكة العربية السعودية.
+        <GlassCard className="prose prose-invert max-w-none font-light leading-loose text-sm text-[#999994]">
+          <h2 className="text-[#c5a975] text-xl mb-4">1. سياسة الاسترجاع السيادية</h2>
+          <p className="mb-8">
+            في عالم الفخامة، الخطأ غير مقبول. يمكنك تقديم طلب استرجاع للقطعة خلال 7 أيام من تاريخ الاستلام، بشرط أن تكون في حالتها التغليفية الأصلية غير مفتوحة وغير مستخدمة، وذلك بموجب قانون التجارة الإلكترونية السعودي.
           </p>
-
-          <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>فترة الاسترجاع:</h3>
-          <p style={{ marginBottom: '1.5rem' }}>
-            يحق للعميل استرجاع المنتج خلال 7 أيام من تاريخ الاستلام، واستبداله خلال 14 يوماً، بشرط أن يكون المنتج بحالته الأصلية غير مفتوح ولم يتم استخدامه.
+          
+          <h2 className="text-[#c5a975] text-xl mb-4">2. الإعدادات المالية</h2>
+          <p className="mb-8">
+            يتم استرداد المبلغ عبر نفس طريقة الدفع الأصلية (آبل باي، مدى، أو تمارا) خلال مدة تتراوح بين 3 إلى 14 يوم عمل. مع الأخذ بعين الاعتبار أي رسوم بنكية دولية إن وجدت. سيتم إصدار إشعار دائن (Credit Note) معتمد من هيئة الزكاة والضريبة والجمارك (ZATCA) لحظياً بانتهاء عملية الاسترداد.
           </p>
-
-          <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>الحالات التي لا يقبل فيها الاسترجاع:</h3>
-          <ul style={{ paddingRight: '1.5rem', marginBottom: '1.5rem' }}>
-            <li>إذا ظهر عيب في المنتج بسبب سوء حيازة أو استخدام العميل.</li>
-            <li>المنتجات التي تم نزع غلافها أو فتح العلبة (إلا في حال وجود عيب مصنعي).</li>
-          </ul>
-
-          <h3 style={{ color: 'var(--text-primary)', marginTop: '2rem', marginBottom: '1rem' }}>الرسوم وتكاليف الشحن:</h3>
-          <p style={{ marginBottom: '1.5rem' }}>
-            عند رغبة العميل بإرجاع منتج سليم غير معيب، يتحمل العميل تكاليف الشحن (الذهاب والإياب). وفي حال كان المنتج معيباً أو به تلف مصنعي، تتحمل المنصة جميع تكاليف الشحن وتوفير البديل بلمسة من الفخامة التي نعدكم بها.
-          </p>
-        </div>
+        </GlassCard>
       </div>
-    </div>
+    </main>
   );
 }
