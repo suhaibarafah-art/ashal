@@ -1,5 +1,5 @@
 /**
- * Saudi Luxury Store - Sovereign Design System
+ * Saudi Luxury Store - Sovereign Design System (Ultra Premium)
  * نظام بصري يعتمد على الفخامة التحريرية (Editorial Luxury).
  */
 
@@ -7,14 +7,13 @@ import React from 'react';
 
 export const GlassCard: React.FC<{ children: React.ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
   <div 
-    className={`glass-sheen hover-lift ${className || ''}`}
+    className={`glass-sheen transition-all duration-700 ${className || ''}`}
     style={{
-      background: 'rgba(255, 255, 255, 0.02)',
-      backdropFilter: 'blur(15px)',
-      WebkitBackdropFilter: 'blur(15px)',
-      border: '1px solid var(--border-color)',
-      padding: '2.5rem',
-      transition: 'var(--transition-luxury)',
+      background: 'rgba(5, 5, 5, 0.4)',
+      backdropFilter: 'blur(30px)',
+      WebkitBackdropFilter: 'blur(30px)',
+      border: '1px solid rgba(197, 169, 117, 0.05)',
+      padding: '3rem',
       ...style
     }}
   >
@@ -24,10 +23,11 @@ export const GlassCard: React.FC<{ children: React.ReactNode, className?: string
 
 export const GoldLine = () => (
   <div style={{ 
-    width: '60px', 
-    height: '1px', 
-    background: 'linear-gradient(to right, transparent, var(--accent-gold), transparent)', 
-    margin: '1.5rem auto' 
+    width: '1px', 
+    height: '60px', 
+    background: 'linear-gradient(to bottom, transparent, #c5a975, transparent)', 
+    opacity: 0.5,
+    margin: '2rem auto' 
   }} />
 );
 
@@ -39,37 +39,37 @@ export const LuxuryButton: React.FC<{
 }> = ({ children, variant = 'primary', onClick, className }) => (
   <button 
     onClick={onClick}
-    className={`btn ${variant === 'primary' ? 'btn-primary' : 'btn-secondary'} ${className || ''}`}
+    className={`btn ${variant === 'primary' ? 'bg-[#c5a975] text-[#020202] hover:bg-transparent hover:text-[#c5a975] border border-[#c5a975]' : 'bg-transparent text-white border border-white/20 hover:border-[#c5a975]'} ${className || ''}`}
   >
     {children}
   </button>
 );
 
 export const SectionHeading: React.FC<{ title: string, subtitle?: string }> = ({ title, subtitle }) => (
-  <div className="text-center mb-20">
-    <span className="text-[10px] uppercase tracking-[0.5em] text-accent-gold mb-4 block">{subtitle}</span>
-    <h2 className="text-5xl font-light text-white mb-6 uppercase tracking-tight">{title}</h2>
-    <GoldLine />
+  <div className="flex flex-col items-center text-center mb-24">
+    <span className="text-[9px] uppercase tracking-[0.6em] text-[#c5a975] mb-6 block font-light opacity-80">{subtitle}</span>
+    <h2 className="text-4xl md:text-6xl font-thin text-[#faf8f5] mb-8 uppercase tracking-widest leading-tight">{title}</h2>
+    <div className="w-px h-16 bg-[#c5a975] opacity-30" />
   </div>
 );
 
 export const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
   // Simple Mock for UI display - in real app, use a hook
   return (
-    <div className="flex gap-4 justify-center items-center font-serif text-accent-gold">
-      <div className="text-center">
-        <span className="text-2xl block">02</span>
-        <span className="text-[8px] uppercase tracking-widest text-gray-500">Hours</span>
+    <div className="flex gap-6 justify-center items-center font-serif text-[#e0ca9a] opacity-90 mix-blend-screen">
+      <div className="flex flex-col items-center">
+        <span className="text-3xl font-light">02</span>
+        <span className="text-[7px] uppercase tracking-[0.4em] text-[#999994] mt-1">Hours</span>
       </div>
-      <span className="opacity-30">:</span>
-      <div className="text-center">
-        <span className="text-2xl block">45</span>
-        <span className="text-[8px] uppercase tracking-widest text-gray-500">Mins</span>
+      <span className="opacity-20 font-thin text-2xl mb-4">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-3xl font-light">45</span>
+        <span className="text-[7px] uppercase tracking-[0.4em] text-[#999994] mt-1">Mins</span>
       </div>
-      <span className="opacity-30">:</span>
-      <div className="text-center">
-        <span className="text-2xl block">12</span>
-        <span className="text-[8px] uppercase tracking-widest text-gray-500">Secs</span>
+      <span className="opacity-20 font-thin text-2xl mb-4">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-3xl font-light">12</span>
+        <span className="text-[7px] uppercase tracking-[0.4em] text-[#999994] mt-1">Secs</span>
       </div>
     </div>
   );

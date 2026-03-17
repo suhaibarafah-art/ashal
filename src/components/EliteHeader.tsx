@@ -1,44 +1,59 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
 
 /**
- * Saudi Luxury Store - Elite Header
- * الترويسة النخبوية - توفر وصولاً سريعاً للسلة والبحث والهوية السيادية.
+ * Saudi Luxury Store - Elite Header (Cinematic Transparent)
+ * الترويسة النخبوية - شفافة بالكامل لدمجها مع الخلفية السينمائية.
  */
 export default function EliteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Add subtle blur only when scrolling down
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
-      <header className="navbar border-b border-white/5 bg-[#050505]/90 backdrop-blur-xl sticky top-0 z-[60]">
-        <div className="container flex justify-between items-center h-24 px-12">
+      <header 
+        className={`fixed top-0 left-0 w-full z-[60] transition-all duration-700 ${
+          scrolled ? 'bg-[#020202]/80 backdrop-blur-2xl border-b border-white/[0.02] py-2' : 'bg-transparent py-6'
+        }`}
+      >
+        <div className="container flex justify-between items-center px-4 md:px-12">
           {/* Logo */}
-          <Link href="/" className="group">
-            <h1 className="text-2xl font-light tracking-[0.2em] luxury-serif group-hover:text-accent-gold transition-colors">
-              الفخامة <span className="italic">LUXURY</span>
+          <Link href="/" className="group flex flex-col">
+            <h1 className="text-xl md:text-3xl font-light tracking-[0.3em] luxury-serif text-white group-hover:text-[#c5a975] transition-colors duration-500">
+              SOVEREIGN
             </h1>
+            <span className="text-[#999994] text-[8px] tracking-[0.5em] uppercase mt-1 opacity-60">Empire</span>
           </Link>
 
           {/* Actions */}
-          <div className="flex items-center gap-12">
-            <button className="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition-colors">
-              البحث
+          <div className="flex items-center gap-8 md:gap-16">
+            <button className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#faf8f5] opacity-70 hover:opacity-100 hover:text-[#c5a975] transition-all duration-500 hidden md:block">
+              Search
             </button>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="relative group py-2"
+              className="relative group py-2 flex items-center gap-3"
             >
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold group-hover:text-accent-gold transition-colors">
-                السلة
+              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#faf8f5] opacity-70 group-hover:opacity-100 group-hover:text-[#c5a975] transition-all duration-500">
+                Cart
               </span>
-              <span className="absolute -top-1 -right-3 w-4 h-4 bg-accent-gold text-onyx text-[8px] flex center rounded-full font-bold">1</span>
+              <div className="w-1.5 h-1.5 bg-[#c5a975] rounded-full animate-pulse" />
             </button>
-            <span className="w-px h-8 bg-white/10" />
-            <Link href="/admin" className="text-[10px] uppercase tracking-widest text-[#b38b4d]/60 hover:text-accent-gold transition-colors">
-              CEO
+            <span className="w-px h-6 bg-white/10 hidden md:block" />
+            <Link href="/admin" className="text-[9px] uppercase tracking-[0.4em] text-[#999994] opacity-40 hover:opacity-100 hover:text-white transition-all duration-500 hidden md:block">
+              CEO Access
             </Link>
           </div>
         </div>
