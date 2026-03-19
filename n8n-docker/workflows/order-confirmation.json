@@ -1,0 +1,41 @@
+{
+  "name": "Order Confirmation Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-created",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Order Created Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "order-created"
+    },
+    {
+      "parameters": {
+        "fromEmail": "orders@ashal.sa",
+        "toEmail": "={{ $json.body.customerEmail }}",
+        "subject": "={{ $json.body.locale === 'ar' ? 'تأكيد طلبك #' + $json.body.orderNumber : 'Order Confirmed #' + $json.body.orderNumber }}",
+        "text": "={{ $json.body.locale === 'ar' ? 'شكراً لطلبك! رقم الطلب: ' + $json.body.orderNumber : 'Thank you for your order! Order #' + $json.body.orderNumber }}",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Order Created Webhook": {
+      "main": [[{ "node": "Send Confirmation Email", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "orders" }]
+}
