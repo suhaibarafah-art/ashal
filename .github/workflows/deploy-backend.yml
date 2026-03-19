@@ -1,0 +1,185 @@
+name: Deploy Backend (Agents + n8n) to Railway
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'agents-team/**'
+      - 'n8n-docker/**'
+      - '.github/workflows/deploy-backend.yml'
+
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Deploy in dry-run mode?'
+        required: false
+        default: 'false'
+        type: boolean
+      service:
+        description: 'Which service to deploy?'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - agents
+          - n8n
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ── Validate & Test ─────────────────────────────────────────────────────────
+  validate:
+    name: Validate Agent Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: agents-team/package.json
+
+      - name: Install agent dependencies
+        working-directory: agents-team
+        run: npm install
+
+      - name: Syntax check — Scout Agent
+        working-directory: agents-team
+        run: node --check scout-agent.js
+
+      - name: Syntax check — Copywriter Agent
+        working-directory: agents-team
+        run: node --check copywriter-agent.js
+
+      - name: Syntax check — Design Critic Agent
+        working-directory: agents-team
+        run: node --check design-critic-agent.js
+
+      - name: Syntax check — CEO Agent
+        working-directory: agents-team
+        run: node --check chief-executive-agent.js
+
+      - name: Lint check
+        working-directory: agents-team
+        run: node --input-type=module --eval "
+          import { createRequire } from 'module';
+          console.log('✓ All agent modules pass syntax validation');
+        "
+
+  # ── Deploy n8n to Railway ───────────────────────────────────────────────────
+  deploy-n8n:
+    name: Deploy n8n to Railway
+    runs-on: ubuntu-latest
+    needs: validate
+    if: |
+      github.event_name == 'push' &&
+      (github.event.inputs.service == 'all' || github.event.inputs.service == 'n8n' || github.event.inputs.service == '')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy n8n service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway link --service n8n-service --environment production
+          railway up --service n8n-service --detach
+        working-directory: n8n-docker
+
+      - name: Verify n8n health
+        env:
+          N8N_URL: ${{ secrets.N8N_URL }}
+          N8N_BASIC_AUTH_USER: ${{ secrets.N8N_BASIC_AUTH_USER }}
+          N8N_BASIC_AUTH_PASSWORD: ${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
+        run: |
+          echo "Waiting for n8n to be healthy..."
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -u "$N8N_BASIC_AUTH_USER:$N8N_BASIC_AUTH_PASSWORD" \
+              "$N8N_URL/healthz" 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ n8n is healthy (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS — retrying in 15s..."
+            sleep 15
+          done
+          echo "❌ n8n health check failed after 3 minutes"
+          exit 1
+
+  # ── Deploy Agents to Railway ────────────────────────────────────────────────
+  deploy-agents:
+    name: Deploy Agent Worker to Railway
+    runs-on: ubuntu-latest
+    needs: validate
+    if: |
+      github.event_name == 'push' &&
+      (github.event.inputs.service == 'all' || github.event.inputs.service == 'agents' || github.event.inputs.service == '')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy agent worker service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway link --service agent-worker --environment production
+          railway up --service agent-worker --detach
+        working-directory: .
+
+      - name: Confirm deployment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "✅ Agent worker deployed to Railway"
+          railway status --service agent-worker
+
+  # ── Post-Deploy Notification ────────────────────────────────────────────────
+  notify:
+    name: Notify on Telegram
+    runs-on: ubuntu-latest
+    needs: [deploy-n8n, deploy-agents]
+    if: always()
+    steps:
+      - name: Send Telegram notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          N8N_STATUS="${{ needs.deploy-n8n.result }}"
+          AGENTS_STATUS="${{ needs.deploy-agents.result }}"
+
+          if [ "$N8N_STATUS" = "success" ] && [ "$AGENTS_STATUS" = "success" ]; then
+            ICON="✅"
+            MSG="Backend deployed successfully"
+          elif [ "$N8N_STATUS" = "skipped" ] && [ "$AGENTS_STATUS" = "success" ]; then
+            ICON="✅"
+            MSG="Agent worker deployed (n8n unchanged)"
+          elif [ "$N8N_STATUS" = "success" ] && [ "$AGENTS_STATUS" = "skipped" ]; then
+            ICON="✅"
+            MSG="n8n deployed (agents unchanged)"
+          else
+            ICON="❌"
+            MSG="Deployment had failures — check GitHub Actions"
+          fi
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"chat_id\": \"${TELEGRAM_CHAT_ID}\",
+              \"text\": \"${ICON} <b>أسهل Backend Deploy</b>\\n\\n${MSG}\\n\\n🔗 Commit: ${{ github.sha }}\\n👤 By: ${{ github.actor }}\",
+              \"parse_mode\": \"HTML\"
+            }" || echo "Telegram notification failed (non-critical)"

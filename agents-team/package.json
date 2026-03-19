@@ -1,0 +1,25 @@
+{
+  "name": "ashal-agents-team",
+  "version": "1.0.0",
+  "description": "Autonomous AI Agent Team for أسهل luxury e-commerce empire",
+  "type": "module",
+  "main": "chief-executive-agent.js",
+  "scripts": {
+    "start": "node chief-executive-agent.js",
+    "scout": "node scout-agent.js",
+    "copy": "node copywriter-agent.js",
+    "critic": "node design-critic-agent.js",
+    "ceo": "node chief-executive-agent.js",
+    "test:scout": "node --env-file=../.env.local scout-agent.js",
+    "test:ceo": "node --env-file=../.env.local chief-executive-agent.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "sharp": "^0.33.5",
+    "node-fetch": "^3.3.2",
+    "p-limit": "^6.2.0",
+    "winston": "^3.17.0"
+  }
+}

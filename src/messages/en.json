@@ -1,0 +1,143 @@
+{
+  "brand": { "name": "Ashal", "tagline": "Smart Daily Solutions" },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "collections": "Collections",
+    "cart": "Cart",
+    "account": "My Account",
+    "search": "Search...",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero_badge": "New 2026",
+    "hero_title": "Daily Solutions\nThat Simplify Life",
+    "hero_subtitle": "Carefully selected products that solve real problems — designed for modern life in Saudi Arabia and the Gulf",
+    "hero_cta": "Shop Now",
+    "hero_cta2": "Explore Collections",
+    "featured_title": "Most Popular",
+    "new_title": "New Arrivals",
+    "view_all": "View All"
+  },
+  "product": {
+    "add_to_cart": "Add to Cart",
+    "buy_now": "Buy Now",
+    "out_of_stock": "Out of Stock",
+    "qty": "Quantity",
+    "description": "Description",
+    "features": "Features",
+    "shipping_info": "Shipping Info",
+    "returns_info": "Returns Policy",
+    "delivery": "Delivery in",
+    "delivery_days": "business days",
+    "free_shipping": "Free shipping on orders over SAR 200",
+    "cod": "Cash on Delivery available",
+    "sar": "SAR",
+    "vat_included": "VAT included",
+    "related": "Related Products"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "empty_cta": "Start Shopping",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "coupon": "Coupon code",
+    "apply": "Apply",
+    "items": "items"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "contact": "Contact Information",
+    "name": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "address": "Shipping Address",
+    "line1": "Street & Neighborhood",
+    "line2": "Additional details (optional)",
+    "city": "City",
+    "region": "Region",
+    "payment": "Payment Method",
+    "cod": "Cash on Delivery",
+    "cod_note": "Pay when your order arrives",
+    "card_test": "Credit Card (Test Mode)",
+    "card_note": "This is test mode — no real charge",
+    "place_order": "Place Order",
+    "summary": "Order Summary",
+    "processing": "Processing...",
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "invalid_phone": "Invalid phone number",
+    "coupon_placeholder": "Coupon code (optional)"
+  },
+  "success": {
+    "title": "Order Confirmed!",
+    "subtitle": "Thank you. We'll send order details to your email",
+    "order_number": "Order Number",
+    "continue": "Continue Shopping",
+    "track": "Track Order"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "name": "Full Name",
+    "phone": "Phone",
+    "submit_login": "Sign In",
+    "submit_register": "Create Account",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "forgot": "Forgot password?"
+  },
+  "account": {
+    "title": "My Account",
+    "orders": "My Orders",
+    "addresses": "Addresses",
+    "profile": "Profile",
+    "no_orders": "No orders yet",
+    "order_number": "Order Number",
+    "order_date": "Date",
+    "order_status": "Status",
+    "order_total": "Total"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions"
+  },
+  "trust": {
+    "shipping": "Fast Shipping",
+    "shipping_detail": "2-5 business days",
+    "returns": "Free Returns",
+    "returns_detail": "Within 14 days of receipt",
+    "payment": "Secure Payment",
+    "payment_detail": "All transactions are encrypted",
+    "support": "24/7 Support",
+    "support_detail": "We're always here to help"
+  },
+  "track": {
+    "title": "Track Your Order",
+    "placeholder": "Enter order number",
+    "search": "Search",
+    "not_found": "Order not found"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "shop": "Shop",
+    "help": "Help",
+    "legal": "Legal",
+    "shipping_policy": "Shipping Policy",
+    "returns_policy": "Returns Policy",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "faq": "FAQ"
+  }
+}
