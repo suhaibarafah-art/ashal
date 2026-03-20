@@ -4,48 +4,116 @@ import React from 'react';
 import Link from 'next/link';
 
 /**
- * Saudi Luxury Store - Empire Footer
- * تذييل الموقع الإمبراطوري - يجمع بين الجمال والروابط الاستراتيجية.
+ * EmpireFooter — Deep Royal Blue Footer
+ * تذييل الإمبراطورية — أزرق ملكي عميق مع تفاصيل ذهبية خردلية
  */
 export default function EmpireFooter() {
   return (
-    <footer className="bg-[#050505] border-t border-[#b38b4d]/10 py-20 px-12 font-serif">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-        <div className="max-w-sm">
-          <h3 className="text-2xl font-light text-[#f8f6f2] mb-6 tracking-tighter uppercase">Saudi <span className="text-[#b38b4d]">Luxury</span></h3>
-          <p className="text-sm text-gray-500 leading-relaxed mb-8">
-            صناعة الفخامة الرقمية في قلب المملكة. نحن نمزج بين عراقة التراث السعودي وابتكار المستقبل السيادي لعام 2026.
-          </p>
-        </div>
+    <footer style={{ background: '#1B2A6B', borderTop: '4px solid #E8761A' }}>
+      {/* Main footer grid */}
+      <div className="container py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
 
-        <div className="grid grid-cols-2 gap-16">
+          {/* Brand col */}
+          <div className="md:col-span-2">
+            <div className="flex flex-col gap-1 mb-6">
+              <span
+                className="text-3xl font-black tracking-tight uppercase"
+                style={{ fontFamily: 'var(--font-montserrat)', color: '#FFFFFF', letterSpacing: '-0.02em' }}
+              >
+                SAUDI<span style={{ color: '#F5C842' }}>LUX</span>
+              </span>
+              <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: 'rgba(144,202,249,0.6)', fontFamily: 'var(--font-montserrat)' }}>
+                Luxury Empire 2026
+              </span>
+            </div>
+            <p className="text-[14px] leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-cairo)', maxWidth: '320px' }}>
+              منصة التجارة الإلكترونية الفاخرة في قلب المملكة العربية السعودية. جودة مضمونة، توصيل سريع، دفع آمن.
+            </p>
+
+            {/* Coupon chips */}
+            <div className="flex flex-wrap gap-3">
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#F5C842', color: '#F5C842' }}>SAVE10</span>
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#F5C842', color: '#F5C842' }}>ROYAL20</span>
+            </div>
+          </div>
+
+          {/* Links col 1 */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#b38b4d] mb-6">الكيان</h4>
-            <ul className="space-y-4 text-xs text-gray-400">
-              <li><Link href="/" className="hover:text-[#f8f6f2] transition-colors">الواجهة الرئيسية</Link></li>
-              <li><Link href="/collections" className="hover:text-[#f8f6f2] transition-colors">المجموعات الملكية</Link></li>
-              <li><Link href="/admin/empire" className="hover:text-[#f8f6f2] transition-colors">رادار الإمبراطورية</Link></li>
+            <h4
+              className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 pb-3"
+              style={{ color: '#F5C842', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
+            >
+              المتجر
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { href: '/', label: 'الرئيسية' },
+                { href: '/collections', label: 'المجموعات' },
+                { href: '/admin', label: 'لوحة التحكم' },
+                { href: '/admin/system-logs', label: 'سجلات النظام' },
+              ].map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-[13px] font-medium transition-all hover:text-white"
+                    style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-cairo)' }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Links col 2 */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-[0.3em] text-[#b38b4d] mb-6">السيادة</h4>
-            <ul className="space-y-4 text-xs text-gray-400">
-              <li><Link href="/legal" className="hover:text-[#f8f6f2] transition-colors">الشروط والخصوصية</Link></li>
-              <li><Link href="/legal" className="hover:text-[#f8f6f2] transition-colors">سياسة الاسترجاع</Link></li>
-              <li><Link href="/contact" className="hover:text-[#f8f6f2] transition-colors">تواصل النخبة</Link></li>
+            <h4
+              className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 pb-3"
+              style={{ color: '#F5C842', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
+            >
+              الدعم
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { href: '/legal', label: 'الشروط والخصوصية' },
+                { href: '/legal', label: 'سياسة الاسترجاع' },
+                { href: '/contact', label: 'تواصل معنا' },
+              ].map((item, i) => (
+                <li key={i}>
+                  <Link
+                    href={item.href}
+                    className="text-[13px] font-medium transition-all hover:text-white"
+                    style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-cairo)' }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p className="text-[10px] text-gray-600 tracking-widest uppercase">
-          © 2026 Saudi Luxury Store | Antigravity Protocol Activated
-        </p>
-        <div className="flex gap-4">
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]/40"></span>
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]"></span>
-            <span className="h-1 w-1 rounded-full bg-[#b38b4d]/40"></span>
+      {/* Trust strip */}
+      <div style={{ background: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="container py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-6 flex-wrap">
+            {[
+              { icon: '🔒', text: 'دفع آمن 100%' },
+              { icon: '🚚', text: 'توصيل سريع' },
+              { icon: '↩️', text: 'إرجاع مجاني' },
+              { icon: '🇸🇦', text: 'مستودع سعودي' },
+            ].map((item) => (
+              <span key={item.text} className="flex items-center gap-2 text-[12px] font-semibold" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-cairo)' }}>
+                <span>{item.icon}</span>
+                {item.text}
+              </span>
+            ))}
+          </div>
+          <p className="text-[11px] font-bold tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-montserrat)' }}>
+            © 2026 SAUDILUX — All Rights Reserved
+          </p>
         </div>
       </div>
     </footer>

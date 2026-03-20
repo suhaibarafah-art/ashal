@@ -1,73 +1,132 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 
 /**
- * Saudi Luxury Store - Editorial Header
- * الترويسة المكتومة - تصميم أبيض فائق النقاء مع حركة سينمائية (Hide on scroll down).
+ * EliteHeader — Deep Royal Blue Navigation + Strategic Orange CTA
+ * الترويسة الملكية — أزرق ملكي عميق مع زر سلة برتقالي
  */
 export default function EliteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest: number) => {
     const previous = scrollY.getPrevious() ?? 0;
-    if (latest > previous && latest > 150) {
-      setHidden(true); // Scrolling down - hide
-    } else {
-      setHidden(false); // Scrolling up - reveal
-    }
+    setHidden(latest > previous && latest > 120);
     setScrolled(latest > 10);
   });
 
   return (
     <>
-      <motion.header 
-        variants={{
-          visible: { y: 0 },
-          hidden: { y: "-100%" }
-        }}
+      <motion.header
+        variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
         animate={hidden ? "hidden" : "visible"}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 w-full z-[60] transition-colors duration-500 bg-white ${
-          scrolled ? 'py-4 shadow-sm' : 'py-6 border-b border-[#EAEAEA]'
-        }`}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 w-full z-[60]"
+        style={{ backgroundColor: '#1B2A6B', boxShadow: scrolled ? '0 4px 20px rgba(27,42,107,0.5)' : 'none' }}
       >
-        <div className="container flex justify-between items-center px-4 md:px-12">
+        {/* Announcement Bar — Orange */}
+        <div
+          className="w-full text-center py-2 text-[11px] font-bold tracking-widest"
+          style={{ background: '#E8761A', color: 'white', fontFamily: 'var(--font-cairo)' }}
+        >
+          🚚 شحن مجاني على الطلبات فوق 299 ريال — كود الخصم:
+          <span
+            className="mx-1 px-2 py-0.5 rounded font-black"
+            style={{ background: 'rgba(255,255,255,0.22)', letterSpacing: '0.15em' }}
+          >ROYAL20</span>
+        </div>
+
+        {/* Main Nav */}
+        <div
+          className={`container flex justify-between items-center transition-all duration-300 ${scrolled ? 'py-3' : 'py-4'}`}
+        >
           {/* Logo */}
-          <Link href="/" className="group flex flex-col items-center">
-            <h1 className="text-2xl md:text-4xl font-light tracking-[0.2em] luxury-serif text-black group-hover:opacity-70 transition-opacity duration-300 uppercase">
-              Ounass
-            </h1>
-            <span className="text-[#555] text-[7px] tracking-[0.6em] uppercase mt-2">Sovereign Edition</span>
+          <Link href="/" className="flex flex-col items-start gap-0.5 group">
+            <span
+              className="text-2xl md:text-[28px] font-black tracking-tight leading-none uppercase group-hover:opacity-90 transition-opacity"
+              style={{ fontFamily: 'var(--font-montserrat)', color: '#FFFFFF', letterSpacing: '-0.02em' }}
+            >
+              SAUDI<span style={{ color: '#F5C842' }}>LUX</span>
+            </span>
+            <span
+              className="text-[9px] tracking-[0.28em] uppercase"
+              style={{ color: 'rgba(144,202,249,0.7)', fontFamily: 'var(--font-montserrat)' }}
+            >
+              Luxury Empire
+            </span>
           </Link>
 
+          {/* Nav Links */}
+          <nav className="hidden md:flex items-center gap-8">
+            {[
+              { href: '/', label: 'الرئيسية' },
+              { href: '/collections', label: 'المجموعات' },
+              { href: '/admin', label: 'لوحة التحكم' },
+              { href: '/admin/system-logs', label: 'سجلات النظام' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="nav-link"
+                style={{
+                  color: 'rgba(255,255,255,0.8)',
+                  fontFamily: 'var(--font-cairo)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
           {/* Actions */}
-          <div className="flex items-center gap-8 md:gap-12">
-            <button className="text-[10px] uppercase tracking-[0.2em] text-[#555] hover:text-black transition-colors duration-300 hidden md:block">
-              Search
-            </button>
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="group py-2 flex items-center gap-2"
+          <div className="flex items-center gap-3">
+            <button
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                color: 'white',
+                fontFamily: 'var(--font-cairo)',
+                border: '1px solid rgba(255,255,255,0.18)',
+              }}
             >
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[#555] group-hover:text-black transition-colors duration-300">
-                Bag
-              </span>
-              <div className="w-1.5 h-1.5 bg-black rounded-full" />
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+              </svg>
+              بحث
             </button>
-            <span className="w-px h-4 bg-[#EAEAEA] hidden md:block" />
-            <Link href="/sohib-vision" className="text-[9px] uppercase tracking-[0.3em] text-[#999994] hover:text-black transition-colors duration-300 hidden md:block">
-              CEO
-            </Link>
+
+            {/* Cart — Orange CTA */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all hover:opacity-90 active:scale-95"
+              style={{
+                background: '#E8761A',
+                color: 'white',
+                fontFamily: 'var(--font-cairo)',
+                boxShadow: '0 4px 18px rgba(232,118,26,0.5)',
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              السلة
+            </button>
           </div>
         </div>
       </motion.header>
+
+      {/* Spacer: announcement ~32px + nav ~72px */}
+      <div style={{ height: '108px' }} />
 
       <EliteCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>

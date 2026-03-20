@@ -3,6 +3,10 @@ generator client {
 }
 
 datasource db {
+  // Phase 4 — Neon PostgreSQL Production DB
+  // To activate: set DATABASE_URL in .env to your Neon connection string:
+  //   postgresql://user:pass@ep-ancient-firefly-14321349.neon.tech/neondb?sslmode=require
+  // Local dev: DATABASE_URL="file:./dev.db" with provider="sqlite"
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
@@ -78,36 +82,75 @@ model EInvoiceZATCA {
 model Product {
   id              String   @id @default(uuid())
   titleEn         String   @unique
-  titleAr         String   // Localized via Gemini API (Saudi luxury dialect)
-  descAr          String   // Luxury storytelling desc
+  titleAr         String
+  descAr          String
   baseCost        Float
   shippingCost    Float
-  finalPrice      Float    // Price Engine Logic applied
-  
+  finalPrice      Float    // (baseCost + shippingCost) * 1.30 * 1.15 rounded to .99
+
+  // Phase 2: Supply Chain fields
+  imageUrl        String   @default("")   // High-res supplier image URL
+  category        String   @default("")   // Product category
+  supplier        String   @default("cj") // "mkhazen" | "cj" | "zendrop"
+  stockLevel      Int      @default(0)    // Live stock from supplier
+  weightKg        Float    @default(0.0)  // Shipping weight
+  dimensions      String   @default("")   // "LxWxH cm" string
+  supplierSku     String   @default("")   // External supplier SKU/ID
+
   oracleId        String?
   oracleReference PredictiveOracle? @relation(fields: [oracleId], references: [id])
-  
+
   campaigns       AIInfluencerCampaign[]
   orders          Order[]
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
-model Order {
+// Phase 4: Coupon Engine — SAVE10 (10% off) | ROYAL20 (20% off)
+model Coupon {
   id              String   @id @default(uuid())
-  productId       String
-  product         Product  @relation(fields: [productId], references: [id])
-  customerPhone   String   // WhatsApp integration
-  customerCity    String
-  totalAmount     Float
-  paymentStatus   String   // Moyasar/ApplePay status
-  
-  logistics       LogisticBot?
-  zatcaInvoice    EInvoiceZATCA?
-  conversation    ConversationalSession?
-  
+  code            String   @unique    // e.g., "SAVE10", "ROYAL20"
+  discountPct     Float               // 0.10 = 10%, 0.20 = 20%
+  isActive        Boolean  @default(true)
+  usageCount      Int      @default(0)
+  maxUsage        Int      @default(1000)
+  orders          Order[]
   createdAt       DateTime @default(now())
+}
+
+// Phase 5: System log entries (stealth mode — no Telegram/Email)
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   @default("INFO") // INFO | WARN | ERROR | SUCCESS
+  source    String                    // e.g., "payment", "supply-chain", "webhook"
+  message   String
+  metadata  String   @default("")     // JSON string of extra data
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id                  String   @id @default(uuid())
+  productId           String
+  product             Product  @relation(fields: [productId], references: [id])
+  customerName        String   @default("")
+  customerPhone       String
+  customerCity        String
+  customerAddress     String   @default("")
+  totalAmount         Float
+  discountAmount      Float    @default(0.0)  // Coupon discount applied
+  paymentStatus       String   // PENDING | PAID | FULFILLING | SHIPPED | DELIVERED
+  moyasarPaymentId    String   @default("")
+  trackingNumber      String   @default("")
+  couponId            String?
+  coupon              Coupon?  @relation(fields: [couponId], references: [id])
+
+  logistics           LogisticBot?
+  zatcaInvoice        EInvoiceZATCA?
+  conversation        ConversationalSession?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 // The Meta-Storefront (Voice-AI / Chatbot sessions)

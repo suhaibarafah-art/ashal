@@ -1,52 +1,146 @@
-import WealthVision from '@/components/WealthVision';
-import { GlassCard, SectionHeading } from '@/components/DesignSystem';
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 /**
- * Saudi Luxury Store - CEO Command Center
- * مركز قيادة الإمبراطورية - لوحة التحكم المالية والاستراتيجية.
+ * Admin Dashboard — Phase 3: Orange/Blue + Live DB Data
  */
-export default function AdminPage() {
+export default async function AdminPage() {
+  const [orderCount, productCount, recentOrders, recentLogs] = await Promise.all([
+    prisma.order.count(),
+    prisma.product.count(),
+    prisma.order.findMany({ orderBy: { createdAt: 'desc' }, take: 8, include: { product: true } }),
+    prisma.systemLog.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
+  ]);
+
+  const revenue = await prisma.order.aggregate({
+    _sum: { totalAmount: true },
+    where: { paymentStatus: { in: ['PAID', 'FULFILLING', 'SHIPPED', 'DELIVERED', 'PAID_AND_ORDERED'] } },
+  });
+  const totalRevenue = revenue._sum.totalAmount ?? 0;
+
+  const kpis = [
+    { label: 'إجمالي الإيرادات', value: `${totalRevenue.toFixed(2)} SAR`, color: 'kpi-orange', icon: '💰' },
+    { label: 'عدد الطلبات', value: String(orderCount), color: 'kpi-blue', icon: '📦' },
+    { label: 'المنتجات', value: String(productCount), color: 'kpi-mustard', icon: '🛍️' },
+    { label: 'صحة النظام', value: '100%', color: 'kpi-green', icon: '✅' },
+  ];
+
+  const statusColor: Record<string, string> = {
+    PENDING: '#F59E0B', PAID: '#3B82F6', PAID_AND_ORDERED: '#6366F1',
+    FULFILLING: '#8B5CF6', SHIPPED: '#10B981', DELIVERED: '#16A34A',
+  };
+  const logColor: Record<string, string> = {
+    SUCCESS: '#16A34A', INFO: '#3B82F6', WARN: '#F59E0B', ERROR: '#DC2626',
+  };
+
   return (
-    <main className="min-h-screen bg-[#050505] p-12 overflow-hidden">
-      <SectionHeading title="مركز القيادة السيادية" subtitle="EMPIRE COMMAND CENTER" />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-12 mb-20">
-         <GlassCard className="border-accent-gold/50">
-            <p className="text-[10px] uppercase tracking-widest text-[#f8f6f2] mb-1">صافي الأرباح اليوم</p>
-            <h4 className="text-3xl text-accent-gold font-light">42,500 SAR</h4>
-            <div className="mt-4 text-[8px] text-green-500 font-bold">+12% vs Yesterday</div>
-         </GlassCard>
-         <GlassCard>
-            <p className="text-[10px] uppercase tracking-widest text-[#f8f6f2] mb-1">عدد الطلبات (24ساعة)</p>
-            <h4 className="text-3xl text-accent-gold font-light">84</h4>
-         </GlassCard>
-         <GlassCard>
-            <p className="text-[10px] uppercase tracking-widest text-[#f8f6f2] mb-1">صحة النظام</p>
-            <h4 className="text-3xl text-green-500 font-light">100%</h4>
-         </GlassCard>
-         <GlassCard>
-            <p className="text-[10px] uppercase tracking-widest text-[#f8f6f2] mb-1">رادار الهبّة</p>
-            <h4 className="text-3xl text-accent-gold font-light">Active</h4>
-         </GlassCard>
+    <main className="admin-bg">
+      {/* Top bar */}
+      <div className="w-full px-8 py-4 flex items-center justify-between" style={{ background: '#1B2A6B', borderBottom: '3px solid #E8761A' }}>
+        <div>
+          <h1 className="text-[22px] font-black text-white" style={{ fontFamily: 'var(--font-cairo)' }}>مركز القيادة</h1>
+          <p className="text-[11px]" style={{ color: 'rgba(144,202,249,0.7)', fontFamily: 'var(--font-montserrat)' }}>SAUDILUX ADMIN — LIVE</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/system-logs">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#E8761A', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              سجلات النظام
+            </button>
+          </Link>
+          <Link href="/">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', fontFamily: 'var(--font-cairo)', cursor: 'pointer', border: 'none' }}>
+              الواجهة
+            </button>
+          </Link>
+          <div className="flex items-center gap-2">
+            <span className="pulse-dot" />
+            <span className="text-[11px] font-semibold" style={{ color: '#86EFAC', fontFamily: 'var(--font-montserrat)' }}>LIVE</span>
+          </div>
+        </div>
       </div>
 
-      <WealthVision />
+      <div className="container py-10">
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+          {kpis.map((kpi, i) => (
+            <div key={i} className={`kpi-card ${kpi.color}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">{kpi.icon}</span>
+                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-montserrat)' }}>{kpi.label}</p>
+              </div>
+              <p className="admin-stat-value">{kpi.value}</p>
+            </div>
+          ))}
+        </div>
 
-      <div className="mt-20 border-t border-white/5 pt-12">
-        <h5 className="text-[10px] uppercase tracking-[0.4em] text-gray-500 mb-8">Pulse History</h5>
-        <div className="space-y-4 font-mono text-[10px]">
-            <div className="flex justify-between text-gray-400">
-                <span>[09:00:00] P&L Report Generated: Net 42.5k SAR.</span>
-                <span className="text-accent-gold">OK</span>
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          <a href="/api/products/sync" target="_blank">
+            <button className="btn-primary text-[14px] py-3 px-6">🤖 Scout — مزامنة المنتجات</button>
+          </a>
+          <Link href="/admin/system-logs">
+            <button className="btn-secondary text-[14px] py-3 px-6">📋 سجلات النظام</button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Orders */}
+          <div className="card-luxury">
+            <h2 className="text-[18px] font-black mb-5 flex items-center gap-2" style={{ fontFamily: 'var(--font-cairo)' }}>
+              <span style={{ color: 'var(--color-orange)' }}>📦</span> آخر الطلبات
+            </h2>
+            {recentOrders.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)', fontSize: '13px' }}>لا توجد طلبات بعد.</p>
+            ) : (
+              <div className="space-y-3">
+                {recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }}>
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-bold truncate" style={{ fontFamily: 'var(--font-cairo)', color: 'var(--text-primary)', maxWidth: '160px' }}>{order.product.titleAr}</p>
+                      <p className="text-[11px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-montserrat)' }}>
+                        {new Date(order.createdAt).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-[14px] font-black" style={{ color: 'var(--color-orange)', fontFamily: 'var(--font-montserrat)' }}>{order.totalAmount.toFixed(0)} SAR</span>
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ background: `${statusColor[order.paymentStatus] ?? '#888'}22`, color: statusColor[order.paymentStatus] ?? '#888', fontFamily: 'var(--font-montserrat)', border: `1px solid ${statusColor[order.paymentStatus] ?? '#888'}44` }}>
+                        {order.paymentStatus}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* System Logs */}
+          <div className="card-luxury">
+            <h2 className="text-[18px] font-black mb-5 flex items-center gap-2" style={{ fontFamily: 'var(--font-cairo)' }}>
+              <span style={{ color: 'var(--color-blue)' }}>🔍</span> سجلات النظام (Stealth)
+            </h2>
+            {recentLogs.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)', fontSize: '13px' }}>لا توجد سجلات بعد.</p>
+            ) : (
+              <div className="space-y-2">
+                {recentLogs.map((log) => (
+                  <div key={log.id} className="log-row">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded flex-shrink-0" style={{ background: `${logColor[log.level] ?? '#888'}18`, color: logColor[log.level] ?? '#888', fontFamily: 'var(--font-montserrat)' }}>{log.level}</span>
+                      <span className="text-[12px] truncate" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-montserrat)' }}>[{log.source}] {log.message}</span>
+                    </div>
+                    <span className="text-[10px] flex-shrink-0 ml-2" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-montserrat)' }}>
+                      {new Date(log.createdAt).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-4">
+              <Link href="/admin/system-logs" className="text-[13px] font-bold" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-cairo)' }}>عرض كل السجلات ←</Link>
             </div>
-            <div className="flex justify-between text-gray-400">
-                <span>[03:00:00] System Backup Completed (Sovereign Cloud).</span>
-                <span className="text-accent-gold">OK</span>
-            </div>
-            <div className="flex justify-between text-gray-400">
-                <span>[00:00:00] Nightly Code Audit: No security leaks detected.</span>
-                <span className="text-accent-gold">OK</span>
-            </div>
+          </div>
         </div>
       </div>
     </main>

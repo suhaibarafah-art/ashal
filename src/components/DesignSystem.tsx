@@ -8,7 +8,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// Replaces GlassCard - Clean, borderless or thin bordered white card
+// GlassCard — Orange/Blue brand (Phase 1 upgrade), backward-compat alias
+export const GlassCard: React.FC<{ children: React.ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
+  <div
+    className={`card-luxury ${className || ''}`}
+    style={style}
+  >
+    {children}
+  </div>
+);
+
+// EditorialCard — Clean white card
 export const EditorialCard: React.FC<{ children: React.ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
   <div 
     className={`bg-white transition-all duration-700 ${className || ''}`}
