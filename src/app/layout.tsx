@@ -1,36 +1,44 @@
-import type { Metadata } from "next";
-import { Inter, Cairo, Almarai, Playfair_Display } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Cairo, Montserrat } from "next/font/google";
 import "./globals.css";
 import AiAssistant from "@/components/AiAssistant";
 import AIVIPWidget from "@/components/AIVIPWidget";
 import EmpireFooter from "@/components/EmpireFooter";
 import EliteHeader from "@/components/EliteHeader";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
+// Arabic: Cairo Bold — modern Saudi feel, high-legibility
 const cairo = Cairo({
   variable: "--font-cairo",
-  subsets: ["arabic"],
-  weight: ["300", "400", "500", "700"],
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
-const almarai = Almarai({
-  variable: "--font-almarai",
-  subsets: ["arabic"],
-  weight: ["300", "400", "700"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+// English: Montserrat Bold — global tech & luxury vibe
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "دروب شيبينغ السعودية | الفخامة (Luxury Zero-Touch)",
-  description: "منصة التجارة الإلكترونية المعززة بالذكاء الاصطناعي - جيل 2026",
+  title: "متجر الفخامة السعودي | Saudi Luxury Store",
+  description: "منصة التجارة الإلكترونية الفاخرة — توصيل سريع داخل المملكة، جودة مضمونة، دفع آمن عبر Moyasar",
+  keywords: ["متجر سعودي", "luxury", "saudi store", "هدايا فاخرة", "تسوق اونلاين"],
+  openGraph: {
+    title: "متجر الفخامة السعودي",
+    description: "منتجات فاخرة بتوصيل سريع داخل المملكة",
+    locale: "ar_SA",
+    type: "website",
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#002366',
 };
 
 export default function RootLayout({
@@ -40,7 +48,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${inter.variable} ${cairo.variable} ${almarai.variable} ${playfair.variable} antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className={`${cairo.variable} ${montserrat.variable} antialiased`}>
         <EliteHeader />
         {children}
         <EmpireFooter />

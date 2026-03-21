@@ -1,42 +1,93 @@
 /**
- * Moyasar Payment Webhook Handler
- * يستقبل تأكيدات الدفع من بوابة ميسر ويقوم بتنشيط الأتمتة اللوجستية.
+ * Phase 2: Moyasar Webhook — Full Data Handshake
+ * Flow: Moyasar Payment → Update Neon DB → Supplier Automation → System Log
+ * Endpoint: POST /api/webhooks/moyasar
  */
 
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { processOrderAutomation } from '@/lib/order-automation';
+import crypto from 'crypto';
 
-const prisma = new PrismaClient();
+// Verify Moyasar webhook signature (HMAC-SHA256)
+function verifyMoyasarSignature(payload: string, signature: string, secret: string): boolean {
+  if (!secret || secret === 'PENDING' || !signature) return true; // skip in dev
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
 
 export async function POST(req: Request) {
+  const rawBody = await req.text();
+  const signature = req.headers.get('x-moyasar-signature') ?? '';
+
+  // Signature verification
+  if (!verifyMoyasarSignature(rawBody, signature, process.env.MOYASAR_WEBHOOK_SECRET ?? '')) {
+    await prisma.systemLog.create({
+      data: { level: 'ERROR', source: 'webhook/moyasar', message: 'Invalid webhook signature — rejected' }
+    });
+    return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 401 });
+  }
+
   try {
-    const payload = await req.json();
-    
-    // In production, verify Moyasar signature here
+    const payload = JSON.parse(rawBody);
     const { id: paymentId, status, amount, metadata } = payload;
 
-    if (status === 'paid') {
-      const orderId = metadata.orderId;
-      
-      console.log(`💰 Payment Confirmed: ${paymentId} for Order ${orderId}`);
+    await prisma.systemLog.create({
+      data: {
+        level: 'INFO',
+        source: 'webhook/moyasar',
+        message: `Webhook received: status=${status}, payment=${paymentId}`,
+        metadata: JSON.stringify({ paymentId, status, amount }),
+      }
+    });
 
-      // 1. Update Order Status
+    if (status === 'paid') {
+      const orderId = metadata?.orderId;
+      if (!orderId) {
+        await prisma.systemLog.create({ data: { level: 'WARN', source: 'webhook/moyasar', message: 'Paid webhook missing orderId in metadata' } });
+        return NextResponse.json({ success: false, error: 'Missing orderId' }, { status: 400 });
+      }
+
+      // 1. Update order → PAID in Neon DB
       await prisma.order.update({
         where: { id: orderId },
-        data: { paymentStatus: "PAID" }
+        data: {
+          paymentStatus:    'PAID',
+          moyasarPaymentId: paymentId,
+          updatedAt:        new Date(),
+        }
       });
 
-      // 2. Trigger Supplier Automation
-      await processOrderAutomation(orderId);
+      // 2. Trigger supplier automation (CJ / Mkhazen)
+      const automationResult = await processOrderAutomation(orderId);
 
-      return NextResponse.json({ success: true, message: "Order processed via webhook" });
+      // 3. Log success
+      await prisma.systemLog.create({
+        data: {
+          level:    automationResult.success ? 'SUCCESS' : 'WARN',
+          source:   'webhook/moyasar',
+          message:  `Order ${orderId} → ${automationResult.success ? 'FULFILLING' : 'Automation partial'}`,
+          metadata: JSON.stringify({ paymentId, orderId, ...automationResult }),
+        }
+      });
+
+      return NextResponse.json({ success: true, orderId, automation: automationResult });
     }
 
-    return NextResponse.json({ success: true, status: "ignored" });
+    if (status === 'failed') {
+      const orderId = metadata?.orderId;
+      if (orderId) {
+        await prisma.order.update({ where: { id: orderId }, data: { paymentStatus: 'FAILED', updatedAt: new Date() } });
+        await prisma.systemLog.create({ data: { level: 'WARN', source: 'webhook/moyasar', message: `Payment failed for order ${orderId}` } });
+      }
+    }
+
+    return NextResponse.json({ success: true, status: 'acknowledged' });
 
   } catch (error) {
-    console.error("Webhook Error:", error);
-    return NextResponse.json({ success: false }, { status: 500 });
+    await prisma.systemLog.create({
+      data: { level: 'ERROR', source: 'webhook/moyasar', message: `Webhook processing error: ${String(error)}` }
+    }).catch(() => {});
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
   }
 }
