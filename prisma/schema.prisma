@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  // Phase 4 — Neon PostgreSQL Production DB
-  // To activate: set DATABASE_URL in .env to your Neon connection string:
+  // Neon PostgreSQL (production on Vercel)
+  // Set DATABASE_URL in Vercel env vars to your Neon connection string:
   //   postgresql://user:pass@ep-ancient-firefly-14321349.neon.tech/neondb?sslmode=require
-  // Local dev: DATABASE_URL="file:./dev.db" with provider="sqlite"
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // 1. عراف الهبّة (The Predictive Oracle)
