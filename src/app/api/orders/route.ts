@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       address?:        string;
       amount:          number | string;
       couponCode?:     string;
+      paymentMethod?:  'online' | 'cod';
     };
 
     const { productId, phone, city } = body;
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
         customerAddress: body.address ?? '',
         totalAmount,
         discountAmount,
-        paymentStatus:   'PENDING',
+        paymentStatus:   body.paymentMethod === 'cod' ? 'PENDING_COD' : 'PENDING',
         ...(couponId ? { couponId } : {}),
       }
     });

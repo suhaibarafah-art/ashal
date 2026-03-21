@@ -42,6 +42,7 @@ const CITIES = [
 export default function CheckoutClient({ product, moyasarKey, siteUrl }: CheckoutClientProps) {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
   const [form, setForm] = useState({ name: '', phone: '', city: '', address: '', coupon: '' });
   const [couponStatus, setCouponStatus] = useState<{ applied: boolean; code: string; discount: number } | null>(null);
   const [orderId, setOrderId] = useState('');
@@ -98,13 +99,20 @@ export default function CheckoutClient({ product, moyasarKey, siteUrl }: Checkou
           address: form.address,
           amount: finalAmount,
           couponCode: couponStatus?.applied ? couponStatus.code : undefined,
+          paymentMethod,
         }),
       });
       const data = await res.json() as { success: boolean; orderId?: string; totalAmount?: number; error?: string };
       if (!data.success || !data.orderId) throw new Error(data.error ?? 'فشل إنشاء الطلب');
       setOrderId(data.orderId);
       setFinalAmount(data.totalAmount ?? finalAmount);
-      setStep(2);
+      if (paymentMethod === 'cod') {
+        // COD: skip payment, go directly to success
+        setStep(3);
+        setTimeout(() => router.push(`/orders/${data.orderId}`), 1500);
+      } else {
+        setStep(2);
+      }
     } catch (err) {
       setError(String(err));
     } finally {
@@ -326,13 +334,40 @@ export default function CheckoutClient({ product, moyasarKey, siteUrl }: Checkou
                   </div>
                 </div>
 
+                {/* Payment Method */}
+                <div>
+                  <label style={{ display: 'block', fontFamily: 'var(--font-cairo)', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                    طريقة الدفع
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <button type="button" onClick={() => setPaymentMethod('online')} style={{
+                      padding: '14px 10px', borderRadius: '10px', border: `2px solid ${paymentMethod === 'online' ? '#FF8C00' : 'var(--border-color)'}`,
+                      background: paymentMethod === 'online' ? 'rgba(255,140,0,0.08)' : 'var(--bg-tertiary)',
+                      cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s',
+                    }}>
+                      <div style={{ fontSize: '22px', marginBottom: '4px' }}>💳</div>
+                      <div style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', fontWeight: 900, color: paymentMethod === 'online' ? '#FF8C00' : 'var(--text-primary)' }}>دفع إلكتروني</div>
+                      <div style={{ fontFamily: 'var(--font-montserrat)', fontSize: '10px', color: 'var(--text-muted)' }}>Visa · mada · Apple Pay · STC</div>
+                    </button>
+                    <button type="button" onClick={() => setPaymentMethod('cod')} style={{
+                      padding: '14px 10px', borderRadius: '10px', border: `2px solid ${paymentMethod === 'cod' ? '#16a34a' : 'var(--border-color)'}`,
+                      background: paymentMethod === 'cod' ? 'rgba(22,163,74,0.08)' : 'var(--bg-tertiary)',
+                      cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s',
+                    }}>
+                      <div style={{ fontSize: '22px', marginBottom: '4px' }}>💵</div>
+                      <div style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', fontWeight: 900, color: paymentMethod === 'cod' ? '#16a34a' : 'var(--text-primary)' }}>الدفع عند الاستلام</div>
+                      <div style={{ fontFamily: 'var(--font-montserrat)', fontSize: '10px', color: 'var(--text-muted)' }}>Cash on Delivery</div>
+                    </button>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   className="btn-primary"
                   disabled={loading}
-                  style={{ fontSize: '17px', padding: '18px', opacity: loading ? 0.7 : 1 }}
+                  style={{ fontSize: '17px', padding: '18px', opacity: loading ? 0.7 : 1, background: paymentMethod === 'cod' ? '#16a34a' : undefined }}
                 >
-                  {loading ? '⏳ جارٍ المعالجة...' : `متابعة للدفع — SAR ${finalAmount.toFixed(2)}`}
+                  {loading ? '⏳ جارٍ المعالجة...' : paymentMethod === 'cod' ? `✅ تأكيد الطلب COD — SAR ${finalAmount.toFixed(2)}` : `متابعة للدفع — SAR ${finalAmount.toFixed(2)}`}
                 </button>
               </form>
             </div>
