@@ -8,7 +8,7 @@ datasource db {
   //   postgresql://user:pass@ep-ancient-firefly-14321349.neon.tech/neondb?sslmode=require
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // 1. عراف الهبّة (The Predictive Oracle)
