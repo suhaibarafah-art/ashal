@@ -9,7 +9,9 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(req: Request) {
   try {
-    const { code, price } = await req.json() as { code: string; price: number };
+    const body = await req.json() as { code: string; price?: number; amount?: number };
+    const { code } = body;
+    const price = body.amount ?? body.price ?? 0;
 
     if (!code || !price) {
       return NextResponse.json({ success: false, error: 'code and price required' }, { status: 400 });

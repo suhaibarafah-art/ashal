@@ -1,0 +1,74 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║           MISSING / PENDING API KEYS — Saudi Luxury Store            ║
+║           يجب إضافة هذه المفاتيح قبل الإطلاق الفعلي                  ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[1] MOYASAR — بوابة الدفع (حاضر ✅ للتحقق)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY = pk_live_...  ✅ موجود في .env
+  MOYASAR_SECRET_KEY                  = sk_live_...  ✅ موجود في .env
+  MOYASAR_WEBHOOK_SECRET              = PENDING ⚠️   — أضفه من لوحة Moyasar
+
+  الإجراء: Dashboard Moyasar → Webhooks → Create → https://yourdomain.com/api/webhooks/moyasar
+           انسخ الـ Signing Secret واضعه في MOYASAR_WEBHOOK_SECRET
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[2] DATABASE_URL — Neon PostgreSQL (للإنتاج)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  DATABASE_URL = file:./dev.db  ← حاليًا SQLite (تطوير)
+
+  للإنتاج: غيّر إلى:
+    DATABASE_URL="postgresql://user:pass@ep-ancient-firefly-14321349.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+  ثم:  npx prisma generate && npx prisma db push
+       npx ts-node prisma/seed-coupons.ts
+
+  تغيير في prisma/schema.prisma:
+    provider = "postgresql"   (بدلًا من "sqlite")
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[3] CJ DROPSHIPPING ✅ موجود (للتحقق من الصلاحيات)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CJ_API_KEY = CJ5242864@api@... ✅ موجود في .env
+
+  اختبر بـ: GET /api/products/sync
+  إذا فشل: تحقق من صلاحيات API في لوحة CJ Dropshipping
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[4] GEMINI API — Agent Copywriter (اختياري)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GEMINI_API_KEY = PENDING ⚠️
+
+  الحصول على مفتاح: https://aistudio.google.com/app/apikey
+  بدونه: Agent Copywriter يعمل بوضع fallback (يضيف جملة افتراضية)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[5] WHATSAPP BUSINESS CLOUD API (اختياري)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  WHATSAPP_TOKEN     = PENDING ⚠️
+  WHATSAPP_PHONE_ID  = PENDING ⚠️
+
+  بدونهما: الطلبات تعمل عادياً، لكن لا إشعارات WhatsApp للعميل
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[6] TELEGRAM (اختياري)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TELEGRAM_BOT_TOKEN = PENDING ⚠️
+  TELEGRAM_CHAT_ID   = PENDING ⚠️
+
+  بدونهما: Stealth mode يبقى نشطاً (كل شيء في /admin/system-logs)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[7] SITE URL — للـ callback links
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  NEXT_PUBLIC_SITE_URL = https://saudilux.store  ← غيّر لدومينك الفعلي
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIORITY ORDER:
+  1. DATABASE_URL (Neon)        → بلا قاعدة بيانات = لا شيء يعمل
+  2. MOYASAR_WEBHOOK_SECRET     → بلاه = المدفوعات لا تُؤكَّد
+  3. NEXT_PUBLIC_SITE_URL       → ضروري لـ callback URL الصحيح
+  4. GEMINI_API_KEY             → Copywriter fallback جاهز بدونه
+  5. WHATSAPP / TELEGRAM        → اختياري، Stealth mode كافٍ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

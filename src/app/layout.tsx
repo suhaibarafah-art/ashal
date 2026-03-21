@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cairo, Montserrat } from "next/font/google";
 import "./globals.css";
 import AiAssistant from "@/components/AiAssistant";
@@ -24,7 +24,21 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "متجر الفخامة السعودي | Saudi Luxury Store",
-  description: "منصة التجارة الإلكترونية الفاخرة — توصيل سريع، جودة مضمونة، دفع آمن",
+  description: "منصة التجارة الإلكترونية الفاخرة — توصيل سريع داخل المملكة، جودة مضمونة، دفع آمن عبر Moyasar",
+  keywords: ["متجر سعودي", "luxury", "saudi store", "هدايا فاخرة", "تسوق اونلاين"],
+  openGraph: {
+    title: "متجر الفخامة السعودي",
+    description: "منتجات فاخرة بتوصيل سريع داخل المملكة",
+    locale: "ar_SA",
+    type: "website",
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#002366',
 };
 
 export default function RootLayout({

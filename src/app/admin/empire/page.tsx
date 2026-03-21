@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
  */
 export default function EmpireDashboard() {
   const [vitals, setVitals] = useState({ state: 'OPTIMAL', pulse: 'ACTIVE', products: 0 });
-  const [empireTrends, setEmpireTrends] = useState([]);
+  const [empireTrends, setEmpireTrends] = useState<string[]>([]);
 
   useEffect(() => {
     // Simulate fetching empire vitals

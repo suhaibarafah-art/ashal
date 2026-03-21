@@ -38,7 +38,7 @@ export function applyCoupon(
   finalPrice: number,
   couponCode: string
 ): { discountedPrice: number; discountAmount: number } {
-  const COUPONS: Record<string, number> = { SAVE10: 0.10, ROYAL20: 0.20 };
+  const COUPONS: Record<string, number> = { SAVE10: 0.10, ROYAL20: 0.20, VIP15: 0.15 };
   const pct = COUPONS[couponCode.toUpperCase()] ?? 0;
   const discountAmount = Math.round(finalPrice * pct * 100) / 100;
   return {

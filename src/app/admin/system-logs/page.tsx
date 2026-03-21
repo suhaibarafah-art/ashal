@@ -32,7 +32,7 @@ export default async function SystemLogsPage() {
   return (
     <main className="admin-bg">
       {/* Header */}
-      <div className="w-full px-8 py-4 flex items-center justify-between" style={{ background: '#1B2A6B', borderBottom: '3px solid #E8761A' }}>
+      <div className="w-full px-8 py-4 flex items-center justify-between" style={{ background: '#002366', borderBottom: '3px solid #FF8C00' }}>
         <div>
           <h1 className="text-[22px] font-black text-white" style={{ fontFamily: 'var(--font-cairo)' }}>
             سجلات النظام — Stealth Mode
@@ -59,7 +59,7 @@ export default async function SystemLogsPage() {
         {/* Level counters */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
-            { label: 'إجمالي', value: counts.total, color: '#1B2A6B' },
+            { label: 'إجمالي', value: counts.total, color: '#002366' },
             { label: 'SUCCESS', value: counts.success, color: '#15803D' },
             { label: 'INFO', value: counts.info, color: '#1D4ED8' },
             { label: 'WARN', value: counts.warn, color: '#A16207' },
@@ -124,7 +124,7 @@ export default async function SystemLogsPage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(27,42,107,0.1)', color: '#1B2A6B', fontFamily: 'var(--font-montserrat)' }}>
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded" style={{ background: 'rgba(27,42,107,0.1)', color: '#002366', fontFamily: 'var(--font-montserrat)' }}>
                           {log.source}
                         </span>
                         <span className="text-[13px] font-semibold" style={{ color: lc.text, fontFamily: 'var(--font-cairo)' }}>

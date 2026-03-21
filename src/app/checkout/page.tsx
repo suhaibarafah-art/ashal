@@ -1,13 +1,8 @@
-import RoyalCheckout from '@/components/RoyalCheckout';
-
 /**
- * Saudi Luxury Store - Checkout Page
- * صفحة الدفع - بوابة الانتقال من الزائر إلى المالك السيادي.
+ * /checkout → redirect to homepage (checkout is per-product at /checkout/[id])
  */
-export default function CheckoutPage() {
-  return (
-    <main className="bg-[#050505] min-h-screen">
-      <RoyalCheckout />
-    </main>
-  );
+import { redirect } from 'next/navigation';
+
+export default function CheckoutIndex() {
+  redirect('/');
 }

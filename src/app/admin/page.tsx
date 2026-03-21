@@ -38,14 +38,24 @@ export default async function AdminPage() {
   return (
     <main className="admin-bg">
       {/* Top bar */}
-      <div className="w-full px-8 py-4 flex items-center justify-between" style={{ background: '#1B2A6B', borderBottom: '3px solid #E8761A' }}>
+      <div className="w-full px-8 py-4 flex items-center justify-between" style={{ background: '#002366', borderBottom: '3px solid #FF8C00' }}>
         <div>
           <h1 className="text-[22px] font-black text-white" style={{ fontFamily: 'var(--font-cairo)' }}>مركز القيادة</h1>
           <p className="text-[11px]" style={{ color: 'rgba(144,202,249,0.7)', fontFamily: 'var(--font-montserrat)' }}>SAUDILUX ADMIN — LIVE</p>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/admin/orders">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(59,130,246,0.25)', color: '#90CAF9', border: '1px solid rgba(59,130,246,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              📦 الطلبات
+            </button>
+          </Link>
+          <Link href="/admin/war-room">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.3)', color: '#FF8C00', border: '1px solid #FF8C00', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              ⚔️ War Room
+            </button>
+          </Link>
           <Link href="/admin/system-logs">
-            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#E8761A', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
               سجلات النظام
             </button>
           </Link>
@@ -77,9 +87,18 @@ export default async function AdminPage() {
 
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-3 mb-8">
+          <a href="/api/sys/empire-seed" target="_blank">
+            <button className="btn-primary text-[14px] py-3 px-6">🌱 تهيئة قاعدة البيانات (20 منتج)</button>
+          </a>
           <a href="/api/products/sync" target="_blank">
             <button className="btn-primary text-[14px] py-3 px-6">🤖 Scout — مزامنة المنتجات</button>
           </a>
+          <Link href="/admin/war-room">
+            <button className="btn-primary text-[14px] py-3 px-6">⚔️ War Room</button>
+          </Link>
+          <Link href="/admin/orders">
+            <button className="btn-secondary text-[14px] py-3 px-6">📦 إدارة الطلبات</button>
+          </Link>
           <Link href="/admin/system-logs">
             <button className="btn-secondary text-[14px] py-3 px-6">📋 سجلات النظام</button>
           </Link>

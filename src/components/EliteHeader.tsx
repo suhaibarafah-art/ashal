@@ -4,12 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 /**
  * EliteHeader — Deep Royal Blue Navigation + Strategic Orange CTA
- * الترويسة الملكية — أزرق ملكي عميق مع زر سلة برتقالي
+ * Hidden on: /admin/*, /checkout/*, /orders/*
  */
 export default function EliteHeader() {
+  const pathname = usePathname();
+  const isHidden = pathname.startsWith('/admin') || pathname.startsWith('/checkout') || pathname.startsWith('/orders');
+  if (isHidden) return null;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -28,12 +32,12 @@ export default function EliteHeader() {
         animate={hidden ? "hidden" : "visible"}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="fixed top-0 left-0 w-full z-[60]"
-        style={{ backgroundColor: '#1B2A6B', boxShadow: scrolled ? '0 4px 20px rgba(27,42,107,0.5)' : 'none' }}
+        style={{ backgroundColor: '#002366', boxShadow: scrolled ? '0 4px 20px rgba(27,42,107,0.5)' : 'none' }}
       >
         {/* Announcement Bar — Orange */}
         <div
           className="w-full text-center py-2 text-[11px] font-bold tracking-widest"
-          style={{ background: '#E8761A', color: 'white', fontFamily: 'var(--font-cairo)' }}
+          style={{ background: '#FF8C00', color: 'white', fontFamily: 'var(--font-cairo)' }}
         >
           🚚 شحن مجاني على الطلبات فوق 299 ريال — كود الخصم:
           <span
@@ -52,7 +56,7 @@ export default function EliteHeader() {
               className="text-2xl md:text-[28px] font-black tracking-tight leading-none uppercase group-hover:opacity-90 transition-opacity"
               style={{ fontFamily: 'var(--font-montserrat)', color: '#FFFFFF', letterSpacing: '-0.02em' }}
             >
-              SAUDI<span style={{ color: '#F5C842' }}>LUX</span>
+              SAUDI<span style={{ color: '#FFDB58' }}>LUX</span>
             </span>
             <span
               className="text-[9px] tracking-[0.28em] uppercase"
@@ -108,7 +112,7 @@ export default function EliteHeader() {
               onClick={() => setIsCartOpen(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all hover:opacity-90 active:scale-95"
               style={{
-                background: '#E8761A',
+                background: '#FF8C00',
                 color: 'white',
                 fontFamily: 'var(--font-cairo)',
                 boxShadow: '0 4px 18px rgba(232,118,26,0.5)',
@@ -126,7 +130,7 @@ export default function EliteHeader() {
       </motion.header>
 
       {/* Spacer: announcement ~32px + nav ~72px */}
-      <div style={{ height: '108px' }} />
+      <div style={{ height: '108px' }} aria-hidden="true" />
 
       <EliteCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>

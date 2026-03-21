@@ -4,9 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +16,7 @@ export async function POST(req: Request) {
     const products = await prisma.product.findMany();
     
     // Simulate data transformation for Salla/Zid formats
-    const payload = products.map((p: any) => ({
+    const payload = products.map((p) => ({
        sku: p.titleEn,
        name: p.titleAr,
        price: p.finalPrice,

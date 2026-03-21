@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 /**
- * EmpireFooter — Deep Royal Blue Footer
- * تذييل الإمبراطورية — أزرق ملكي عميق مع تفاصيل ذهبية خردلية
+ * EmpireFooter — Hidden on admin/checkout/orders routes
  */
 export default function EmpireFooter() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/admin') || pathname.startsWith('/checkout') || pathname.startsWith('/orders')) return null;
   return (
-    <footer style={{ background: '#1B2A6B', borderTop: '4px solid #E8761A' }}>
+    <footer style={{ background: '#002366', borderTop: '4px solid #FF8C00' }}>
       {/* Main footer grid */}
       <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -21,7 +23,7 @@ export default function EmpireFooter() {
                 className="text-3xl font-black tracking-tight uppercase"
                 style={{ fontFamily: 'var(--font-montserrat)', color: '#FFFFFF', letterSpacing: '-0.02em' }}
               >
-                SAUDI<span style={{ color: '#F5C842' }}>LUX</span>
+                SAUDI<span style={{ color: '#FFDB58' }}>LUX</span>
               </span>
               <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: 'rgba(144,202,249,0.6)', fontFamily: 'var(--font-montserrat)' }}>
                 Luxury Empire 2026
@@ -33,8 +35,8 @@ export default function EmpireFooter() {
 
             {/* Coupon chips */}
             <div className="flex flex-wrap gap-3">
-              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#F5C842', color: '#F5C842' }}>SAVE10</span>
-              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#F5C842', color: '#F5C842' }}>ROYAL20</span>
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>SAVE10</span>
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>ROYAL20</span>
             </div>
           </div>
 
@@ -42,7 +44,7 @@ export default function EmpireFooter() {
           <div>
             <h4
               className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 pb-3"
-              style={{ color: '#F5C842', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
+              style={{ color: '#FFDB58', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
             >
               المتجر
             </h4>
@@ -70,7 +72,7 @@ export default function EmpireFooter() {
           <div>
             <h4
               className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 pb-3"
-              style={{ color: '#F5C842', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
+              style={{ color: '#FFDB58', fontFamily: 'var(--font-montserrat)', borderBottom: '1px solid rgba(245,200,66,0.2)' }}
             >
               الدعم
             </h4>

@@ -7,22 +7,22 @@
      ACCENT: Soft Mustard Yellow | BG: Clean Off-White
      ═══════════════════════════════════════════════════ */
 
-  /* PRIMARY: Strategic Orange — Energy, CTAs, Buttons */
-  --color-orange:        #E8761A;
-  --color-orange-dark:   #C96010;
-  --color-orange-light:  #F59340;
-  --color-orange-ghost:  rgba(232, 118, 26, 0.10);
+  /* PRIMARY: Strategic Orange #FF8C00 — CTAs/Buttons */
+  --color-orange:        #FF8C00;
+  --color-orange-dark:   #D97400;
+  --color-orange-light:  #FFA733;
+  --color-orange-ghost:  rgba(255, 140, 0, 0.10);
 
-  /* SECONDARY: Deep Royal Blue — Nav, Footer, Trust */
-  --color-blue:          #1B2A6B;
-  --color-blue-dark:     #111C4E;
-  --color-blue-light:    #2D45A0;
-  --color-blue-ghost:    rgba(27, 42, 107, 0.08);
+  /* SECONDARY: Deep Royal Blue #002366 — Nav/Footer */
+  --color-blue:          #002366;
+  --color-blue-dark:     #001540;
+  --color-blue-light:    #0A3A8F;
+  --color-blue-ghost:    rgba(0, 35, 102, 0.08);
 
-  /* ACCENT: Soft Mustard Yellow — Sale Tags, Highlights */
-  --color-mustard:       #F5C842;
-  --color-mustard-dark:  #D4A820;
-  --color-mustard-ghost: rgba(245, 200, 66, 0.18);
+  /* ACCENT: Warm Mustard Yellow #FFDB58 — Sale Tags */
+  --color-mustard:       #FFDB58;
+  --color-mustard-dark:  #E6C200;
+  --color-mustard-ghost: rgba(255, 219, 88, 0.20);
 
   /* BACKGROUNDS */
   --bg-primary:    #F8F6F0;
