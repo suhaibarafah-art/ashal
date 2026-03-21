@@ -1,40 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/keep-alive",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/health-check",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/sync-trends",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/cron/ab-evolution",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/cron/content",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/ads",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/quality-control",
-      "schedule": "0 0 * * *"
-    },
-    {
       "path": "/api/agents/run",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/agents/run",
-      "schedule": "0 18 * * *"
     }
   ],
   "headers": [
