@@ -8,31 +8,12 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { cjFetch } from '@/lib/cj';
 import { notifyCritical } from './ceo';
 import { sendTelegramAlert } from '@/lib/telegram';
 
-const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
-
-async function getCJToken(): Promise<string> {
-  const stored = process.env.CJ_ACCESS_TOKEN;
-  if (stored) return stored;
-  const res  = await fetch(`${CJ_BASE}/authentication/getAccessToken`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: process.env.CJ_EMAIL ?? '', password: process.env.CJ_PASSWORD ?? '' }),
-  });
-  const data = await res.json();
-  const token: string = data?.data?.accessToken ?? '';
-  if (!token) throw new Error('CJ auth failed in Orders sync');
-  return token;
-}
-
-async function fetchCJTracking(token: string, orderId: string): Promise<string | null> {
-  // CJ order query by our internal order ID stored in metadata
-  const res  = await fetch(
-    `${CJ_BASE}/order/getOrderDetail?orderId=${encodeURIComponent(orderId)}`,
-    { headers: { 'CJ-Access-Token': token } }
-  );
+async function fetchCJTracking(orderId: string): Promise<string | null> {
+  const res  = await cjFetch(`/order/getOrderDetail?orderId=${encodeURIComponent(orderId)}`);
   const data = await res.json();
   const trackNo: string = data?.data?.trackNumber ?? data?.data?.logisticsTrackNo ?? '';
   return trackNo || null;
@@ -50,17 +31,9 @@ export async function runOrdersSync(): Promise<{ synced: number; failed: number 
 
   if (orders.length === 0) return { synced: 0, failed: 0 };
 
-  let token: string;
-  try {
-    token = await getCJToken();
-  } catch (err) {
-    await notifyCritical('Orders/CJ', 'Cannot authenticate to CJ for tracking sync', err);
-    return { synced: 0, failed: orders.length };
-  }
-
   for (const order of orders) {
     try {
-      const tracking = await fetchCJTracking(token, order.id);
+      const tracking = await fetchCJTracking(order.id);
       if (tracking) {
         await prisma.order.update({
           where: { id: order.id },

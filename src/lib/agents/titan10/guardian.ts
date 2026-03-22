@@ -7,29 +7,12 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { cjFetch } from '@/lib/cj';
 import { notifyCritical } from './ceo';
 import { sendTelegramAlert } from '@/lib/telegram';
 
-const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
-
-async function getCJToken(): Promise<string> {
-  const stored = process.env.CJ_ACCESS_TOKEN;
-  if (stored) return stored;
-  const res  = await fetch(`${CJ_BASE}/authentication/getAccessToken`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: process.env.CJ_EMAIL ?? '', password: process.env.CJ_PASSWORD ?? '' }),
-  });
-  const data = await res.json();
-  const token: string = data?.data?.accessToken ?? '';
-  if (!token) throw new Error('CJ auth failed in Guardian');
-  return token;
-}
-
-async function fetchCJStock(token: string, pid: string): Promise<number> {
-  const res  = await fetch(`${CJ_BASE}/product/query?pid=${pid}`, {
-    headers: { 'CJ-Access-Token': token },
-  });
+async function fetchCJStock(pid: string): Promise<number> {
+  const res  = await cjFetch(`/product/query?pid=${pid}`);
   const data = await res.json();
   return Number(data?.data?.inventory ?? data?.data?.stock ?? -1);
 }
@@ -47,17 +30,9 @@ export async function runGuardian(): Promise<{ hidden: number; restored: number;
 
   if (products.length === 0) return { hidden: 0, restored: 0, checked: 0 };
 
-  let token: string;
-  try {
-    token = await getCJToken();
-  } catch (err) {
-    await notifyCritical('Guardian/CJ', 'Cannot authenticate to CJ for stock check', err);
-    return { hidden: 0, restored: 0, checked: 0 };
-  }
-
   for (const product of products) {
     try {
-      const stock = await fetchCJStock(token, product.supplierSku);
+      const stock = await fetchCJStock(product.supplierSku);
       checked++;
 
       if (stock === 0 && !product.isHidden) {

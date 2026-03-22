@@ -6,9 +6,8 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { cjFetch } from '@/lib/cj';
 import { notifyCritical } from './ceo';
-
-const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
 
 const SEARCH_KEYWORDS = [
   'smart home', 'wireless charger', 'led desk lamp',
@@ -16,29 +15,8 @@ const SEARCH_KEYWORDS = [
   'bluetooth earbuds', 'portable fan',
 ];
 
-async function getCJToken(): Promise<string> {
-  const stored = process.env.CJ_ACCESS_TOKEN;
-  if (stored) return stored;
-
-  const res = await fetch(`${CJ_BASE}/authentication/getAccessToken`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email:    process.env.CJ_EMAIL    ?? '',
-      password: process.env.CJ_PASSWORD ?? '',
-    }),
-  });
-  const data = await res.json();
-  const token: string = data?.data?.accessToken ?? '';
-  if (!token) throw new Error('CJ auth failed — check CJ_ACCESS_TOKEN or CJ_EMAIL/CJ_PASSWORD');
-  return token;
-}
-
-async function fetchCJProducts(token: string, keyword: string): Promise<CJRawProduct[]> {
-  const res = await fetch(
-    `${CJ_BASE}/product/list?keyword=${encodeURIComponent(keyword)}&pageNum=1&pageSize=5`,
-    { headers: { 'CJ-Access-Token': token } }
-  );
+async function fetchCJProducts(keyword: string): Promise<CJRawProduct[]> {
+  const res  = await cjFetch(`/product/list?keyword=${encodeURIComponent(keyword)}&pageNum=1&pageSize=5`);
   const data = await res.json();
   return (data?.data?.list ?? []) as CJRawProduct[];
 }
@@ -60,11 +38,9 @@ export async function runScout(): Promise<{ queued: number; skipped: number }> {
   let skipped = 0;
 
   try {
-    const token = await getCJToken();
-
     for (const keyword of SEARCH_KEYWORDS) {
       try {
-        const items = await fetchCJProducts(token, keyword);
+        const items = await fetchCJProducts(keyword);
 
         for (const p of items) {
           if (!p.pid || !p.productImage) { skipped++; continue; }
