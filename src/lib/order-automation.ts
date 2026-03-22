@@ -5,6 +5,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendTelegramAlert as telegramAlert } from '@/lib/telegram';
 
 export async function processOrderAutomation(orderId: string) {
   try {
@@ -65,7 +66,7 @@ export async function processOrderAutomation(orderId: string) {
     );
 
     // 6. Telegram alert to admin
-    await sendTelegramAlert(order.id, order.product.titleAr, Number(order.totalAmount));
+    await telegramAlert('SALE', `طلب جديد\n🆔 ${order.id.slice(-8).toUpperCase()}\n🛍️ ${order.product.titleAr}\n💰 ${Number(order.totalAmount).toFixed(2)} SAR\n📦 تتبع: ${supplierResponse.tracking}`);
 
     // 7. Log success to SystemLog
     await prisma.systemLog.create({

@@ -35,15 +35,18 @@ async function fetchFromCJ(keyword: string): Promise<SupplierProduct[]> {
   }
 
   try {
-    // Step 1: Get bearer token
-    const authRes = await fetch('https://developers.cjdropshipping.com/api2.0/v1/authentication/getAccessToken', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: process.env.CJ_EMAIL ?? '', password: process.env.CJ_PASSWORD ?? '' }),
-    });
-    const authData = await authRes.json();
-    const token: string = authData?.data?.accessToken;
-    if (!token) throw new Error('CJ auth failed');
+    // Step 1: Get bearer token (use CJ_ACCESS_TOKEN if available, else authenticate)
+    let token: string = process.env.CJ_ACCESS_TOKEN ?? '';
+    if (!token) {
+      const authRes = await fetch('https://developers.cjdropshipping.com/api2.0/v1/authentication/getAccessToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: process.env.CJ_EMAIL ?? '', password: process.env.CJ_PASSWORD ?? '' }),
+      });
+      const authData = await authRes.json();
+      token = authData?.data?.accessToken ?? '';
+      if (!token) throw new Error('CJ auth failed');
+    }
 
     // Step 2: Search products
     const searchRes = await fetch(
