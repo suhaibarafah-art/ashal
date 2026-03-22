@@ -2,6 +2,34 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductActions } from './ProductActions';
+import type { Metadata } from 'next';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
+
+// ── Dynamic metadata per product ──────────────────────────────────────────────
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const product = await prisma.product.findUnique({ where: { id } });
+  if (!product) return { title: 'منتج غير موجود' };
+  const p = product as unknown as { imageUrl?: string };
+  return {
+    title: `${product.titleAr} | متجر الفخامة السعودي`,
+    description: product.descAr.slice(0, 160),
+    openGraph: {
+      title: product.titleAr,
+      description: product.descAr.slice(0, 160),
+      images: p.imageUrl ? [{ url: p.imageUrl, width: 800, height: 800, alt: product.titleAr }] : [],
+      locale: 'ar_SA',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.titleAr,
+      description: product.descAr.slice(0, 160),
+      images: p.imageUrl ? [p.imageUrl] : [],
+    },
+  };
+}
 
 /**
  * Saudi Pro Product Page — Phase 4
@@ -9,6 +37,7 @@ import { ProductActions } from './ProductActions';
  * - Social proof (reviews + rating)
  * - Urgency: sold count + delivery promise
  * - ProductActions client component for interactivity
+ * - JSON-LD structured data for Google Shopping
  */
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -222,6 +251,40 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </Link>
         </div>
       </div>
+
+      {/* JSON-LD structured data — Google Shopping & rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.titleAr,
+            description: product.descAr,
+            image: imageUrl,
+            url: `${SITE_URL}/products/${product.id}`,
+            brand: { '@type': 'Brand', name: 'متجر الفخامة السعودي' },
+            offers: {
+              '@type': 'Offer',
+              price: product.finalPrice.toFixed(2),
+              priceCurrency: 'SAR',
+              availability: stockLevel > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+              priceValidUntil: new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
+              seller: { '@type': 'Organization', name: 'متجر الفخامة السعودي' },
+              shippingDetails: {
+                '@type': 'OfferShippingDetails',
+                shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'SAR' },
+                deliveryTime: { '@type': 'ShippingDeliveryTime', businessDays: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2 } },
+              },
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: ratingHalf ? '4.5' : '4',
+              reviewCount: String(reviewCount),
+            },
+          }),
+        }}
+      />
     </main>
   );
 }

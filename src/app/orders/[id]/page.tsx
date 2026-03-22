@@ -10,12 +10,12 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 const STATUS_STEPS = [
-  { key: 'PENDING',         label: 'تم الطلب',         icon: '📋', desc: 'طلبك قيد الانتظار' },
-  { key: 'PAID',            label: 'تم الدفع',          icon: '✅', desc: 'تم تأكيد الدفع بنجاح' },
-  { key: 'PAID_AND_ORDERED',label: 'تأكيد المورد',      icon: '🏭', desc: 'تم إرسال الطلب للمورد' },
-  { key: 'FULFILLING',      label: 'جارٍ التجهيز',      icon: '📦', desc: 'يُجهَّز طلبك الآن' },
-  { key: 'SHIPPED',         label: 'تم الشحن',          icon: '🚚', desc: 'في الطريق إليك' },
-  { key: 'DELIVERED',       label: 'تم التوصيل',        icon: '🏠', desc: 'استُلم طلبك بنجاح' },
+  { key: 'PENDING',         label: 'تم الطلب',         icon: '📋', desc: 'طلبك قيد الانتظار — سيُؤكَّد خلال دقائق' },
+  { key: 'PAID',            label: 'تم الدفع',          icon: '✅', desc: 'تم تأكيد الدفع بنجاح ✓' },
+  { key: 'PAID_AND_ORDERED',label: 'تأكيد المورد',      icon: '🏭', desc: 'أُرسل للمورد — جارٍ التجهيز' },
+  { key: 'FULFILLING',      label: 'جارٍ التجهيز',      icon: '📦', desc: 'يُجهَّز طلبك الآن في المستودع' },
+  { key: 'SHIPPED',         label: 'تم الشحن',          icon: '🚚', desc: 'في الطريق إليك — يصلك خلال 24-48 ساعة' },
+  { key: 'DELIVERED',       label: 'تم التوصيل',        icon: '🏠', desc: '🎉 استُلم طلبك بنجاح! شكراً لثقتك بنا' },
 ];
 
 const STATUS_COLOR: Record<string, string> = {
@@ -37,7 +37,14 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
   const currentStepIdx = STATUS_STEPS.findIndex(s => s.key === order.paymentStatus);
   const isFailed = order.paymentStatus === 'FAILED';
 
-  const product = order.product as unknown as { titleAr: string; titleEn: string; finalPrice: number; imageUrl?: string };
+  const product = order.product as unknown as { titleAr: string; titleEn: string; finalPrice: number; imageUrl?: string; supplier?: string };
+
+  // Estimated delivery: local=2d, CJ=4d from order creation
+  const isLocal = String((product as Record<string, unknown>).supplier ?? 'cj') === 'mkhazen';
+  const deliveryDays = isLocal ? 2 : 4;
+  const estimatedDelivery = new Date(order.createdAt);
+  estimatedDelivery.setDate(estimatedDelivery.getDate() + deliveryDays);
+  const estimatedDeliveryStr = estimatedDelivery.toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long' });
   const imageUrl = product.imageUrl && product.imageUrl.startsWith('http')
     ? product.imageUrl
     : 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80';
@@ -119,15 +126,15 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
               مراحل الطلب
             </h2>
             <div style={{ position: 'relative' }}>
-              {/* Vertical line */}
-              <div style={{ position: 'absolute', right: '19px', top: '20px', bottom: '20px', width: '2px', background: 'var(--border-color)' }} />
+              {/* Vertical line — left side for RTL layout */}
+              <div style={{ position: 'absolute', left: '19px', top: '20px', bottom: '20px', width: '2px', background: 'var(--border-color)' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                 {STATUS_STEPS.map((step, idx) => {
                   const isDone = currentStepIdx >= idx;
                   const isCurrent = currentStepIdx === idx;
                   return (
-                    <div key={step.key} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', padding: '10px 0', position: 'relative' }}>
-                      {/* Circle */}
+                    <div key={step.key} style={{ display: 'flex', flexDirection: 'row-reverse', gap: '16px', alignItems: 'flex-start', padding: '10px 0', position: 'relative' }}>
+                      {/* Circle — right side in RTL */}
                       <div style={{
                         width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -139,7 +146,7 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
                         {step.icon}
                       </div>
                       {/* Text */}
-                      <div style={{ paddingTop: '6px' }}>
+                      <div style={{ paddingTop: '6px', flex: 1, textAlign: 'right' }}>
                         <p style={{
                           fontFamily: 'var(--font-cairo)', fontWeight: isCurrent ? 900 : 600,
                           fontSize: '15px',
@@ -158,6 +165,17 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
                   );
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Estimated Delivery */}
+        {!isFailed && order.paymentStatus !== 'DELIVERED' && (
+          <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>📅</span>
+            <div>
+              <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '2px' }}>التوصيل المتوقع</p>
+              <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '15px', fontWeight: 900, color: '#10B981' }}>{estimatedDeliveryStr}</p>
             </div>
           </div>
         )}
@@ -181,6 +199,40 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
                 <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{value}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Contact Support */}
+        <div className="card-luxury" style={{ marginTop: '16px', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+            هل تحتاج مساعدة؟ فريقنا جاهز 24/7
+          </p>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a
+              href="https://wa.me/966500000000"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                background: '#25D366', color: 'white', borderRadius: '8px',
+                padding: '8px 16px', fontFamily: 'var(--font-cairo)', fontWeight: 700, fontSize: '13px',
+                textDecoration: 'none',
+              }}
+            >
+              💬 واتساب
+            </a>
+            <a
+              href={`mailto:support@saudilux.store?subject=طلب رقم ${order.id.slice(-8).toUpperCase()}`}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                background: 'var(--bg-tertiary)', color: 'var(--text-primary)', borderRadius: '8px',
+                border: '1px solid var(--border-color)',
+                padding: '8px 16px', fontFamily: 'var(--font-cairo)', fontWeight: 700, fontSize: '13px',
+                textDecoration: 'none',
+              }}
+            >
+              ✉️ راسلنا
+            </a>
           </div>
         </div>
 

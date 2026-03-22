@@ -113,11 +113,11 @@ export default function HomeClient({ products }: HomeClientProps) {
             </Link>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} className="mt-8 flex items-center gap-3">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} className="mt-8 flex items-center gap-3 flex-wrap">
             <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-cairo)' }}>كود الخصم:</span>
+            <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>LUXURY10</span>
             <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>SAVE10</span>
             <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>ROYAL20</span>
-            <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>VIP15</span>
           </motion.div>
         </motion.div>
 
@@ -217,18 +217,18 @@ export default function HomeClient({ products }: HomeClientProps) {
           {products.length === 0 && (
             <div className="text-center py-20">
               <p className="text-[16px] font-semibold" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)' }}>
-                جارٍ تحميل المنتجات... شغّل Titan-5 Scout لمزامنة المنتجات.
+                جارٍ تحميل المنتجات... شغّل Titan-5 لمزامنة المنتجات.
               </p>
-              <a href="/api/agents/run" target="_blank">
-                <button className="btn-primary mt-6 text-[14px] px-8 py-4">🤖 تشغيل Scout</button>
+              <a href="/api/cron/master" target="_blank">
+                <button className="btn-primary mt-6 text-[14px] px-8 py-4">🤖 تشغيل Titan-5</button>
               </a>
             </div>
           )}
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex justify-center mt-14">
-            <Link href="/collections">
-              <button className="btn-secondary text-[15px] px-10 py-4">عرض جميع المنتجات</button>
-            </Link>
+            <a href="/api/sys/empire-seed" target="_blank" rel="noopener">
+              <button className="btn-secondary text-[15px] px-10 py-4">🌱 تحميل المزيد من المنتجات</button>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -274,7 +274,7 @@ export default function HomeClient({ products }: HomeClientProps) {
             <p className="text-[15px] font-medium" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-cairo)' }}>استخدم كود الخصم عند الدفع واستمتع بتوفير يصل إلى 20%</p>
           </div>
           <div className="flex flex-wrap gap-4">
-            {['SAVE10', 'ROYAL20', 'VIP15'].map(code => (
+            {['LUXURY10', 'SAVE10', 'ROYAL20'].map(code => (
               <div key={code} className="coupon-badge text-[16px] px-6 py-3" style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.6)', color: '#FFFFFF', fontSize: '16px', letterSpacing: '0.2em' }}>
                 {code}
               </div>
