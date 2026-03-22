@@ -151,7 +151,7 @@ async function sendWhatsAppNotification(
 ) {
   const token = process.env.WHATSAPP_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
 
   if (!token || !phoneNumberId || token === 'placeholder') {
     console.log(`[WhatsApp] No token — would notify ${phone} for order ${orderId}`);

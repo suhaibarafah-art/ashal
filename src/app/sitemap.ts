@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
 
   const products = await prisma.product.findMany({
     select: { id: true, updatedAt: true },

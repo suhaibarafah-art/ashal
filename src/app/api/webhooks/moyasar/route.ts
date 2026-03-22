@@ -13,7 +13,11 @@ import crypto from 'crypto';
 function verifyMoyasarSignature(payload: string, signature: string, secret: string): boolean {
   if (!secret || secret === 'PENDING' || !signature) return true; // skip in dev
   const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature);
+  // timingSafeEqual requires same length — if different, signature is invalid
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 
 export async function POST(req: Request) {
