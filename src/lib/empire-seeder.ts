@@ -6,6 +6,50 @@
 import { prisma } from './prisma';
 import { calculateDynamicPrice } from './pricing-engine';
 
+// ── Summer Wedding Season 2026 — Flagship + Scout Upsells ──────────────────
+export const SUMMER_PRODUCTS = [
+  // ① Flagship — A/B test product
+  {
+    en: "Sohib-V1 (Crimson Petal)",
+    ar: "صهيب V1 — بتلة القرمزي",
+    cost: 180, shipping: 30,
+    supplier: "mkhazen", category: "أزياء",
+    img: "https://images.unsplash.com/photo-1594938298603-c8148c4b4782?auto=format&fit=crop&w=800&q=85",
+    desc: "عباءة بتلة القرمزي — تصميم حصري لموسم الأعراس الصيفي 2026. نُسجت من أجود أقمشة الكريب الياباني بخيوط مطرّزة يدوياً. كميات محدودة.",
+    stock: 15,
+  },
+  // ② Scout Upsell 1 — Gold Evening Clutch
+  {
+    en: "Gold Evening Clutch — Scout Pick",
+    ar: "حقيبة السهرة الذهبية",
+    cost: 55, shipping: 18,
+    supplier: "cj", category: "clutch",
+    img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80",
+    desc: "حقيبة سهرة ذهبية مزيّنة بتفاصيل معدنية راقية — اختارها Agent Scout لتكمل إطلالة بتلة القرمزي في حفلات الأعراس والغالا الصيفية.",
+    stock: 30,
+  },
+  // ③ Scout Upsell 2 — Crystal Stiletto Heels
+  {
+    en: "Crystal Stiletto Heels — Scout Pick",
+    ar: "كعب ستيليتو كريستالي",
+    cost: 95, shipping: 25,
+    supplier: "cj", category: "heels",
+    img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=600&q=80",
+    desc: "كعب ستيليتو مرصّع بكريستال عالي الجودة — خطوة واحدة تغيّر كل شيء. اختارها Agent Scout خصيصاً لمناسبات الصيف الفاخرة.",
+    stock: 20,
+  },
+  // ④ Scout Upsell 3 — Minimalist Gold Jewelry
+  {
+    en: "Minimalist Gold Jewelry Set — Scout Pick",
+    ar: "طقم مجوهرات ذهبية مينيمالي",
+    cost: 65, shipping: 15,
+    supplier: "cj", category: "jewelry",
+    img: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=600&q=80",
+    desc: "طقم مجوهرات ذهبي مينيمالي — البساطة هي أعلى مراتب الأناقة. اختارها Agent Scout لتتناغم مع ألوان بتلة القرمزي وتكمل الإطلالة.",
+    stock: 40,
+  },
+];
+
 const EMPIRE_TRENDS = [
   { en: "Elite Oud Diffuser", ar: "فواحة العود الملكية الذكية", cost: 120, shipping: 25, supplier: "mkhazen", category: "ديكور", img: "https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80", materials: "رخام، خشب الأبنوس، نحاس", care: "تنظيف جاف بقطعة قماش ناعمة" },
   { en: "Smart Prayer Wall Clock", ar: "ساعة حائط ذكية بمواقيت الصلاة", cost: 85, shipping: 20, supplier: "mkhazen", category: "إلكترونيات", img: "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=600&q=80", materials: "ألمنيوم مطلي، زجاج مقسى", care: "تجنب الرطوبة العالية" },
@@ -30,6 +74,27 @@ const EMPIRE_TRENDS = [
 ];
 
 export class EmpireSeeder {
+  /** Seeds Summer 2026 flagship + 3 Scout upsell products */
+  static async seedSummerCollection(): Promise<number> {
+    let count = 0;
+    for (const p of SUMMER_PRODUCTS) {
+      const finalPrice = calculateDynamicPrice(p.cost, p.shipping, { demandScore: 0.92 });
+      await prisma.product.upsert({
+        where: { titleEn: p.en },
+        update: { finalPrice, imageUrl: p.img, supplier: p.supplier, category: p.category, stockLevel: p.stock },
+        create: {
+          titleEn: p.en, titleAr: p.ar, descAr: p.desc,
+          baseCost: p.cost, shippingCost: p.shipping, finalPrice,
+          imageUrl: p.img, supplier: p.supplier, category: p.category,
+          stockLevel: p.stock,
+          supplierSku: `SUMMER-${p.en.replace(/\s+/g, '-').toUpperCase().slice(0, 20)}`,
+        },
+      });
+      count++;
+    }
+    return count;
+  }
+
   static async seedEmpireCatalog() {
     console.log("🏛️ EmpireSeeder: Initiating sovereign catalog expansion (20 Products)...");
     
