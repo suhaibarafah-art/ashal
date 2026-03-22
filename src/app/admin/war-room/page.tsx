@@ -6,6 +6,8 @@
 
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import AgentHeartbeat from '@/components/AgentHeartbeat';
+import MarketingKitPanel from '@/components/MarketingKitPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -298,6 +300,16 @@ export default async function WarRoomPage() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* ── Agent Heartbeat Panel ── */}
+      <div className="container pb-8">
+        <AgentHeartbeat />
+      </div>
+
+      {/* ── Marketing Kit Panel ── */}
+      <div className="container pb-16">
+        <MarketingKitPanel products={products.map(p => ({ id: p.id, titleAr: p.titleAr, finalPrice: Number(p.finalPrice) }))} />
       </div>
     </main>
   );

@@ -33,7 +33,7 @@ export const EditorialCard: React.FC<{ children: React.ReactNode, className?: st
 );
 
 // Alias for backwards compatibility with older Sovereign components
-export const GlassCard = EditorialCard;
+// GlassCard is already exported above — re-using EditorialCard as the canonical impl
 
 // Replaces GoldLine - Thin black editorial line
 export const EditorialLine = () => (
