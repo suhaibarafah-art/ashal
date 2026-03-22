@@ -25,9 +25,10 @@ export default async function AdminPage() {
   // Query last 24h of VariantEvent data for Crimson Petal
   const since24h = new Date(Date.now() - 86400 * 1000);
 
-  let variantStats: { variantKey: string; _count: { event: number } }[] = [];
   let totalAddToCarts = 0;
   let bestVariant = { key: '—', carts: 0, views: 0, ctr: 0 };
+
+  type RawStat = { variantKey: string; event: string; _count: { event: number } };
 
   try {
     const [rawStats, cartCount] = await Promise.all([
@@ -41,18 +42,15 @@ export default async function AdminPage() {
       }),
     ]);
 
-    variantStats = rawStats as unknown as typeof variantStats;
     totalAddToCarts = cartCount;
 
-    // Aggregate per-variant CTR (add_to_cart / view)
-    const variants = ['royal', 'modern', 'emotional'];
-    const variantData = variants.map(key => {
-      const views = rawStats.find(r => (r as unknown as Record<string,unknown>).variantKey === key && (r as unknown as Record<string,unknown>).event === 'view')
-        ? ((rawStats.find(r => (r as unknown as Record<string,unknown>).variantKey === key && (r as unknown as Record<string,unknown>).event === 'view') as unknown as Record<string,unknown>)._count as Record<string,number>).event
-        : 0;
-      const carts = rawStats.find(r => (r as unknown as Record<string,unknown>).variantKey === key && (r as unknown as Record<string,unknown>).event === 'add_to_cart')
-        ? ((rawStats.find(r => (r as unknown as Record<string,unknown>).variantKey === key && (r as unknown as Record<string,unknown>).event === 'add_to_cart') as unknown as Record<string,unknown>)._count as Record<string,number>).event
-        : 0;
+    const stats = rawStats as unknown as RawStat[];
+
+    const variantData = ['royal', 'modern', 'emotional'].map(key => {
+      const viewRow  = stats.find(r => r.variantKey === key && r.event === 'view');
+      const cartRow  = stats.find(r => r.variantKey === key && r.event === 'add_to_cart');
+      const views    = viewRow?._count.event ?? 0;
+      const carts    = cartRow?._count.event ?? 0;
       return { key, views, carts, ctr: views > 0 ? Math.round((carts / views) * 100) : 0 };
     });
 
