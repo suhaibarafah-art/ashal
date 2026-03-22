@@ -98,6 +98,9 @@ export default async function AdminPage() {
 
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-3 mb-8">
+          <a href="/api/cron/master" target="_blank">
+            <button className="btn-primary text-[14px] py-3 px-6">⚡ Master Cron — تشغيل يدوي</button>
+          </a>
           <a href="/api/sys/empire-seed" target="_blank">
             <button className="btn-primary text-[14px] py-3 px-6">🌱 تهيئة قاعدة البيانات (20 منتج)</button>
           </a>

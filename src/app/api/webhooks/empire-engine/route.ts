@@ -1,64 +1,54 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
 /**
- * 👑 The Sovereign Empire - Core Analytics & Auto-Healing Engine (Cron Webhook)
- * This route is intended to be called by a Vercel Cron Job every night at 12:00 AM.
- * It executes the "Dynamic Pricing" and "White Label Strategy".
+ * Empire Engine — GET /api/webhooks/empire-engine
+ * Safe dynamic pricing + white-label radar.
+ * Can be triggered manually; also called by master cron.
+ *
+ * Safety: price NEVER drops below (baseCost + shippingCost) × 1.20 (20% min margin).
  */
-export async function GET(req: Request) {
+
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { sendTelegramAlert } from '@/lib/telegram';
+
+export async function GET() {
   try {
-    // === 1. WHITE LABEL STRATEGY ===
-    // Find products that have more than 500 successful orders
-    const topProducts = await prisma.product.findMany({
-      include: {
-         orders: true
-      }
+    const products = await prisma.product.findMany({
+      include: { orders: { select: { id: true } } },
     });
 
-    let whiteLabelNotices = 0;
-    for (const product of topProducts) {
-       if (product.orders.length > 500) {
-          console.log(`[WHITE LABEL RADAR] 🚨 Product ${product.titleEn} reached 500 sales! 
-          Time to order in bulk, print the SOHIB BRAND logo, and maximize margins!`);
-          whiteLabelNotices++;
-       }
-    }
+    let adjustments = 0, whiteLabelAlerts = 0;
 
-    // === 2. DYNAMIC PRICING ENGINE ===
-    // Scenario: A competitor drops price by 10 SAR. Our bot detects it.
-    // If our base cost + 15% margin < competitor price, we undercut by 1 SAR.
-    // [SIMULATION: Iterate products and arbitrarily optimize for demo].
-    const competitiveProducts = await prisma.product.findMany({ take: 5 });
-    let priceAdjustments = 0;
-
-    for (const product of competitiveProducts) {
-       const competitorPrice = product.finalPrice - 5; // Simulating competitor price drop
-       const absoluteMinimum = product.baseCost * 1.15; // 15% MIN margin
-
-       if (competitorPrice > absoluteMinimum) {
-           const newDominantPrice = competitorPrice - 1.0;
-           await prisma.product.update({
-               where: { id: product.id },
-               data: { finalPrice: newDominantPrice }
-           });
-           console.log(`[DYNAMIC PRICING] 📉 Lowered price of ${product.titleEn} to ${newDominantPrice} SAR to destroy competitor.`);
-           priceAdjustments++;
-       }
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Sovereign Core Analytics executed successfully.',
-      insights: {
-        whiteLabelNotices,
-        priceAdjustments
+    for (const product of products) {
+      // White-label alert at 100+ orders (every 50 threshold)
+      if (product.orders.length > 0 && product.orders.length % 100 === 0) {
+        await sendTelegramAlert('SUCCESS',
+          `🏷️ White-Label Radar\n\n📦 ${product.titleAr}\n📊 ${product.orders.length} طلب\nحان وقت الطلب بالجملة وطباعة البراند!`
+        );
+        whiteLabelAlerts++;
       }
-    });
+
+      // Safe dynamic pricing: simulate competitor 3% cheaper, undercut by 1 SAR
+      // Only if we stay above 20% margin floor
+      const minAllowed    = (product.baseCost + product.shippingCost) * 1.20;
+      const simulatedComp = product.finalPrice * 0.97;
+      const proposed      = parseFloat((simulatedComp - 1).toFixed(2));
+
+      if (proposed > minAllowed && proposed < product.finalPrice) {
+        await prisma.product.update({ where: { id: product.id }, data: { finalPrice: proposed } });
+        await prisma.systemLog.create({
+          data: {
+            level: 'INFO',
+            source: 'webhook/empire-engine',
+            message: `Price: ${product.titleEn} ${product.finalPrice.toFixed(2)} → ${proposed} SAR (margin: ${(((proposed - product.baseCost - product.shippingCost) / proposed) * 100).toFixed(1)}%)`,
+          },
+        });
+        adjustments++;
+      }
+    }
+
+    return NextResponse.json({ success: true, adjustments, whiteLabelAlerts });
   } catch (error) {
-    console.error('Empire Engine Error:', error);
-    return NextResponse.json({ error: 'Failed to execute Empire Engine' }, { status: 500 });
+    await prisma.systemLog.create({ data: { level: 'ERROR', source: 'webhook/empire-engine', message: String(error) } }).catch(() => {});
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

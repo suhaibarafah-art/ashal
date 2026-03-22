@@ -1,63 +1,70 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
 /**
- * 💼 The Sovereign Empire - Abandoned Cart Recovery (Cron Webhook)
- * This route is intended to be called by a Vercel Cron Job every hour.
+ * Abandoned Cart Recovery — GET /api/webhooks/abandoned-cart
+ * Can be triggered manually from admin; automatic via master cron.
  */
-export async function GET(req: Request) {
-  try {
-    // 1. Fetch carts that have been abandoned but not recovered/lost
-    const carts = await prisma.abandonedCart.findMany({
-      where: {
-        status: 'pending'
-      }
-    });
 
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { sendTelegramAlert } from '@/lib/telegram';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
+
+async function sendWhatsApp(phone: string, message: string) {
+  const token   = process.env.WHATSAPP_TOKEN;
+  const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!token || !phoneId || token === 'placeholder') {
+    console.log(`[WhatsApp/cart] No token — skipping ${phone}`);
+    return;
+  }
+  const intl = phone.replace(/\D/g, '').replace(/^0/, '966');
+  await fetch(`https://graph.facebook.com/v18.0/${phoneId}/messages`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messaging_product: 'whatsapp', to: intl, type: 'text', text: { body: message } }),
+  }).catch(console.error);
+}
+
+export async function GET() {
+  try {
+    const carts = await prisma.abandonedCart.findMany({ where: { status: 'pending' } });
     const now = new Date();
-    let remindersSent = 0;
-    let discountsSent = 0;
+    let remindersSent = 0, discountsSent = 0;
 
     for (const cart of carts) {
-      const targetTime = new Date(cart.createdAt);
-      const hoursDiff = Math.abs(now.getTime() - targetTime.getTime()) / 3600000;
+      const hoursDiff = (now.getTime() - new Date(cart.createdAt).getTime()) / 3_600_000;
+      const contact   = cart.phone ?? cart.email ?? 'unknown';
 
-      // 4-Hour Rule: First Reminder
       if (hoursDiff >= 4 && hoursDiff < 24 && !cart.remindedAt) {
-        // [SIMULATION: Send Email / WhatsApp "Your cart misses you"]
-        console.log(`[Loyalty Engine] Sending 4-Hour Reminder to ${cart.email ?? cart.phone}`);
-        
+        if (cart.phone) {
+          await sendWhatsApp(cart.phone,
+            `مرحباً! 👋 لاحظنا إنك تركت بعض المنتجات الفاخرة في سلة التسوق.\n\nاكمل طلبك الآن وتمتع بالتوصيل خلال 48 ساعة 🚀\n${SITE_URL}`
+          );
+        }
+        await prisma.abandonedCart.update({ where: { id: cart.id }, data: { remindedAt: now } });
+        remindersSent++;
+        await prisma.systemLog.create({ data: { level: 'INFO', source: 'webhook/abandoned-cart', message: `4h reminder → ${contact}` } });
+      } else if (hoursDiff >= 24 && cart.status === 'pending') {
+        if (cart.phone) {
+          await sendWhatsApp(cart.phone,
+            `هدية خاصة لك! 🎁\n\nكود الخصم الحصري: *SOVEREIGN10*\nخصم 10% على طلبك الآن!\n\nالعرض ينتهي خلال 24 ساعة ⏰\n${SITE_URL}`
+          );
+        }
         await prisma.abandonedCart.update({
           where: { id: cart.id },
-          data: { remindedAt: now }
+          data: { status: 'discount_sent', discountCode: 'SOVEREIGN10' },
         });
-        remindersSent++;
-      } 
-      // 24-Hour Rule: 10% Discount Drop
-      else if (hoursDiff >= 24) {
-         // [SIMULATION: Send Email with 10% Code "SOVEREIGN10"]
-         console.log(`[Loyalty Engine] Dropping 10% VIP Discount to ${cart.email ?? cart.phone}`);
-         
-         await prisma.abandonedCart.update({
-             where: { id: cart.id },
-             data: { 
-                 status: 'discount_sent',
-                 discountCode: 'SOVEREIGN10' 
-             }
-         });
-         discountsSent++;
+        discountsSent++;
+        await prisma.systemLog.create({ data: { level: 'INFO', source: 'webhook/abandoned-cart', message: `24h discount → ${contact}` } });
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Sovereign Recovery Engine executed.',
-      stats: { remindersSent, discountsSent }
-    });
+    if (remindersSent + discountsSent > 0) {
+      await sendTelegramAlert('SUCCESS', `🛒 Cart Recovery\n${remindersSent} تذكير + ${discountsSent} كود خصم أُرسلوا`);
+    }
+
+    return NextResponse.json({ success: true, stats: { remindersSent, discountsSent } });
   } catch (error) {
-    console.error('Abandon Cart Engine Error:', error);
-    return NextResponse.json({ error: 'Failed to execute recovery' }, { status: 500 });
+    await prisma.systemLog.create({ data: { level: 'ERROR', source: 'webhook/abandoned-cart', message: String(error) } }).catch(() => {});
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
