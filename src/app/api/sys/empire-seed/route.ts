@@ -14,9 +14,10 @@ export async function GET() {
 
     // Also seed coupons
     const coupons = [
-      { code: 'SAVE10',  discountPct: 0.10, maxUsage: 10000 },
-      { code: 'ROYAL20', discountPct: 0.20, maxUsage: 1000  },
-      { code: 'VIP15',   discountPct: 0.15, maxUsage: 500   },
+      { code: 'SAVE10',    discountPct: 0.10, maxUsage: 10000 },
+      { code: 'ROYAL20',   discountPct: 0.20, maxUsage: 1000  },
+      { code: 'VIP15',     discountPct: 0.15, maxUsage: 500   },
+      { code: 'LUXURY10',  discountPct: 0.10, maxUsage: 5000  }, // TikTok campaign code
     ];
     for (const c of coupons) {
       await prisma.coupon.upsert({
@@ -39,7 +40,7 @@ export async function GET() {
       success: true,
       message: `✅ تم بنجاح — ${productCount} منتج + 3 كودات خصم`,
       productsSeeded: productCount,
-      couponsSeeded: ['SAVE10', 'ROYAL20', 'VIP15'],
+      couponsSeeded: ['SAVE10', 'ROYAL20', 'VIP15', 'LUXURY10'],
       nextStep: 'افتح / لرؤية المنتجات',
     });
   } catch (error) {
