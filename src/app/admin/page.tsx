@@ -60,11 +60,11 @@ export default async function AdminPage() {
               📡 مراقبة
             </button>
           </Link>
-          <a href="#tiktok">
+          <Link href="/admin/marketing">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(255,0,80,0.15)', color: '#FF1493', border: '1px solid rgba(255,0,80,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
-              🎵 تيك توك
+              🎵 التسويق
             </button>
-          </a>
+          </Link>
           <Link href="/admin/system-logs">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
               سجلات النظام

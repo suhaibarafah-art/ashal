@@ -184,17 +184,24 @@ export function TikTokWidget() {
       {/* Divider */}
       <div style={{ height: '1px', background: 'var(--border-color)', marginBottom: '12px' }} />
 
-      {/* Tomorrow preview */}
-      <div className="flex items-center gap-2">
-        <span className="text-[11px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)' }}>
-          غداً ({tomorrow.day}):
-        </span>
-        <span className="text-[11px] font-bold" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-cairo)' }}>
-          {tomorrow.icon} {tomorrow.type}
-        </span>
-        <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${tomorrow.goalColor}18`, color: tomorrow.goalColor, fontFamily: 'var(--font-montserrat)' }}>
-          {tomorrow.goal}
-        </span>
+      {/* Tomorrow preview + link to hub */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)' }}>
+            غداً ({tomorrow.day}):
+          </span>
+          <span className="text-[11px] font-bold" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-cairo)' }}>
+            {tomorrow.icon} {tomorrow.type}
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${tomorrow.goalColor}18`, color: tomorrow.goalColor, fontFamily: 'var(--font-montserrat)' }}>
+            {tomorrow.goal}
+          </span>
+        </div>
+        <a href="/admin/marketing">
+          <span className="text-[11px] font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(232,118,26,0.15)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', cursor: 'pointer', fontFamily: 'var(--font-cairo)' }}>
+            محور التسويق ←
+          </span>
+        </a>
       </div>
     </div>
   );

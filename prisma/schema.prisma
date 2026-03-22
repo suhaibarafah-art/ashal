@@ -102,6 +102,7 @@ model Product {
 
   campaigns       AIInfluencerCampaign[]
   orders          Order[]
+  marketingContent MarketingContent[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -162,6 +163,24 @@ model ConversationalSession {
   conversationLog String   // Stringified JSON
   preferenceTags  String?  // Comma-separated tags
   createdAt       DateTime @default(now())
+}
+
+// Marketing Content — AI Writer output, reviewed by team before publishing
+model MarketingContent {
+  id          String   @id @default(uuid())
+  dayIndex    Int      // 0=Sun … 6=Sat
+  weekOf      String   // "YYYY-MM-DD" of the Sunday of this week
+  contentType String   // Unboxing | The Look | Detail Shot | etc.
+  goal        String   // إثارة الفضول | رفع قيمة السلة | ...
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  captions    String   // JSON: string[]  (3 AI-generated captions)
+  hashtags    String   @default("")
+  status      String   @default("DRAFT") // DRAFT | APPROVED | PUBLISHED
+  teamNotes   String   @default("")
+  supplierRef String   @default("") // supplier SKU / product link used
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // Abandoned Cart Recovery System
