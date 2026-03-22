@@ -171,6 +171,20 @@ model ConversationalSession {
   createdAt       DateTime @default(now())
 }
 
+// A/B Copy Testing — Summer Season 2026
+// Tracks which description variant (Royal/Modern/Emotional) leads to Add to Cart
+model VariantEvent {
+  id          String   @id @default(uuid())
+  sessionId   String                         // Anonymous browser session
+  productId   String                         // The product being viewed
+  variantKey  String                         // "royal" | "modern" | "emotional"
+  event       String                         // "view" | "add_to_cart"
+  createdAt   DateTime @default(now())
+
+  @@index([productId, variantKey, event])
+  @@index([createdAt])
+}
+
 // Abandoned Cart Recovery System
 model AbandonedCart {
   id           String    @id @default(uuid())
