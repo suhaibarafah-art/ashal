@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { TikTokWidget, WeeklyCalendarWidget } from './TikTokWidget';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,11 @@ export default async function AdminPage() {
               📡 مراقبة
             </button>
           </Link>
+          <a href="#tiktok">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(255,0,80,0.15)', color: '#FF1493', border: '1px solid rgba(255,0,80,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              🎵 تيك توك
+            </button>
+          </a>
           <Link href="/admin/system-logs">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
               سجلات النظام
@@ -107,6 +113,29 @@ export default async function AdminPage() {
           <Link href="/admin/system-logs">
             <button className="btn-secondary text-[14px] py-3 px-6">📋 سجلات النظام</button>
           </Link>
+        </div>
+
+        {/* TikTok Content Calendar */}
+        <div id="tiktok" className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="card-luxury">
+            <TikTokWidget />
+          </div>
+          <div className="card-luxury">
+            <WeeklyCalendarWidget />
+          </div>
+        </div>
+
+        {/* Asset Repository Notice */}
+        <div className="mb-8 p-4 rounded-xl flex items-start gap-3" style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.25)' }}>
+          <span className="text-xl">📁</span>
+          <div>
+            <p className="text-[13px] font-black mb-1" style={{ color: '#86EFAC', fontFamily: 'var(--font-cairo)' }}>
+              مستودع المحتوى — /public/marketing/assets/week1/
+            </p>
+            <p className="text-[12px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-cairo)' }}>
+              ارفع فيديوهاتك في هذا المجلد لكل يوم. الوكلاء جاهزون لتحليلها واقتراح التحسينات تلقائياً.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
