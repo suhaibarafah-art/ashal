@@ -140,7 +140,18 @@ async function sendWhatsAppRecovery(phone: string, code: string | null, type: 'r
 
 // ─── Main GET Handler ─────────────────────────────────────────────────────────
 
-export async function GET() {
+export async function GET(req: import('next/server').NextRequest) {
+  // Guard: Vercel sends Authorization: Bearer <CRON_SECRET>
+  // Manual trigger: x-admin-key: <CRON_SECRET>
+  const secret = process.env.CRON_SECRET;
+  if (secret) {
+    const auth = req.headers.get('authorization') ?? '';
+    const key  = req.headers.get('x-admin-key') ?? '';
+    if (auth !== `Bearer ${secret}` && key !== secret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
   const masterStart = Date.now();
   const results: Record<string, unknown> = {};
 

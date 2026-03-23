@@ -8,7 +8,12 @@ import { NextResponse } from 'next/server';
 import { EmpireSeeder } from '@/lib/empire-seeder';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(req: import('next/server').NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (secret) {
+    const key = req.headers.get('x-admin-key') ?? req.headers.get('authorization')?.replace('Bearer ', '') ?? '';
+    if (key !== secret) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const productCount = await EmpireSeeder.seedEmpireCatalog();
 

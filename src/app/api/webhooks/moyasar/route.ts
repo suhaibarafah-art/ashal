@@ -11,11 +11,11 @@ import crypto from 'crypto';
 
 // Verify Moyasar webhook signature (HMAC-SHA256)
 function verifyMoyasarSignature(payload: string, signature: string, secret: string): boolean {
-  if (!secret || secret === 'PENDING' || !signature) return true; // skip in dev
+  if (!secret || secret === 'PENDING') return true; // no secret configured — allow (dev)
+  if (!signature) return false;                      // secret set but no sig header — reject
   const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   const a = Buffer.from(expected);
   const b = Buffer.from(signature);
-  // timingSafeEqual requires same length — if different, signature is invalid
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }

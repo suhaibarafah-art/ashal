@@ -14,7 +14,12 @@ const ALL_COUPONS = [
   { code: 'SOVEREIGN10', discountPct: 0.10, maxUsage: 5000,  note: 'Abandoned cart recovery' },
 ];
 
-export async function GET() {
+export async function GET(req: import('next/server').NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (secret) {
+    const key = req.headers.get('x-admin-key') ?? req.headers.get('authorization')?.replace('Bearer ', '') ?? '';
+    if (key !== secret) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const results = [];
     for (const c of ALL_COUPONS) {
