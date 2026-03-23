@@ -35,7 +35,7 @@ export default async function ControlRoomPage() {
     // Content: green if any products exist in the store
     content: totalProducts > 0,
     // Finance: green if Moyasar live key is configured
-    finance: !!(process.env.MOYASAR_SECRET_KEY?.startsWith('sk_live_')),
+    finance: !!(process.env.MOYASAR_API_KEY?.startsWith('sk_live_')),
     // Operations: green if the system logged any activity in last 24h
     operations: recentActivity > 0,
   };
