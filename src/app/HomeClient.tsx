@@ -226,8 +226,8 @@ export default function HomeClient({ products }: HomeClientProps) {
           )}
 
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex justify-center mt-14">
-            <a href="/api/sys/empire-seed" target="_blank" rel="noopener">
-              <button className="btn-secondary text-[15px] px-10 py-4">🌱 تحميل المزيد من المنتجات</button>
+            <a href="/collections">
+              <button className="btn-secondary text-[15px] px-10 py-4">🛍️ تصفح كل المنتجات</button>
             </a>
           </motion.div>
         </div>

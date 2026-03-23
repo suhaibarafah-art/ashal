@@ -34,7 +34,8 @@ export default function EmpireFooter() {
 
             {/* Coupon chips */}
             <div className="flex flex-wrap gap-3">
-              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>SAVE10</span>
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>LUXURY10</span>
+              <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>SOVEREIGN10</span>
               <span className="coupon-badge" style={{ background: 'rgba(245,200,66,0.15)', borderColor: '#FFDB58', color: '#FFDB58' }}>ROYAL20</span>
             </div>
           </div>
@@ -77,9 +78,12 @@ export default function EmpireFooter() {
             </h4>
             <ul className="space-y-3">
               {[
-                { href: '/legal', label: 'الشروط والخصوصية' },
-                { href: '/legal', label: 'سياسة الاسترجاع' },
-                { href: '/contact', label: 'تواصل معنا' },
+                { href: '/terms',    label: 'الشروط والأحكام' },
+                { href: '/privacy',  label: 'سياسة الخصوصية' },
+                { href: '/returns',  label: 'سياسة الاسترجاع' },
+                { href: '/shipping', label: 'سياسة الشحن' },
+                { href: '/contact',  label: 'تواصل معنا' },
+                { href: '/legal',    label: 'المعلومات القانونية' },
               ].map((item, i) => (
                 <li key={i}>
                   <Link
