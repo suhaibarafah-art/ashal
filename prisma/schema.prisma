@@ -4,11 +4,9 @@ generator client {
 
 datasource db {
   // Neon PostgreSQL (production on Vercel)
-  // Set DATABASE_URL in Vercel env vars to your Neon connection string:
-  //   postgresql://user:pass@ep-ancient-firefly-14321349.neon.tech/neondb?sslmode=require
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  // DATABASE_URL should be the pooled connection string from Neon
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // 1. عراف الهبّة (The Predictive Oracle)
