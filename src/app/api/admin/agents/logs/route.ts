@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
 
 const LOGS_KEY = 'titan5_logs';
 const MAX_LOGS = 200;
 
-async function requireAdmin(req: NextRequest) {
+function requireAdmin(req: NextRequest) {
   const apiKey = req.headers.get('x-admin-key');
-  if (apiKey && apiKey === process.env.CRON_SECRET) return true;
-  const session = await auth();
-  return session?.user && (session.user as any).role === 'ADMIN';
+  return apiKey && apiKey === process.env.CRON_SECRET;
 }
 
 export async function GET(req: NextRequest) {
