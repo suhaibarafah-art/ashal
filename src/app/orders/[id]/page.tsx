@@ -126,8 +126,8 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
               مراحل الطلب
             </h2>
             <div style={{ position: 'relative' }}>
-              {/* Vertical line — left side for RTL layout */}
-              <div style={{ position: 'absolute', left: '19px', top: '20px', bottom: '20px', width: '2px', background: 'var(--border-color)' }} />
+              {/* Vertical line — right side for RTL (circles are on right) */}
+              <div style={{ position: 'absolute', right: '19px', top: '20px', bottom: '20px', width: '2px', background: 'var(--border-color)' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                 {STATUS_STEPS.map((step, idx) => {
                   const isDone = currentStepIdx >= idx;
