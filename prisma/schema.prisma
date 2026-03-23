@@ -106,9 +106,10 @@ model Product {
   oracleId        String?
   oracleReference PredictiveOracle? @relation(fields: [oracleId], references: [id])
 
-  campaigns       AIInfluencerCampaign[]
-  orders          Order[]
-  queueEntries    AgentTaskQueue[]
+  campaigns        AIInfluencerCampaign[]
+  orders           Order[]
+  marketingContent MarketingContent[]
+  queueEntries     AgentTaskQueue[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -171,14 +172,31 @@ model ConversationalSession {
   createdAt       DateTime @default(now())
 }
 
+// Marketing Content — AI Writer output, reviewed by team before publishing
+model MarketingContent {
+  id          String   @id @default(uuid())
+  dayIndex    Int      // 0=Sun … 6=Sat
+  weekOf      String   // "YYYY-MM-DD" of the Sunday of this week
+  contentType String   // Unboxing | The Look | Detail Shot | etc.
+  goal        String   // إثارة الفضول | رفع قيمة السلة | ...
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  captions    String   // JSON: string[]  (3 AI-generated captions)
+  hashtags    String   @default("")
+  status      String   @default("DRAFT") // DRAFT | APPROVED | PUBLISHED
+  teamNotes   String   @default("")
+  supplierRef String   @default("") // supplier SKU / product link used
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // A/B Copy Testing — Summer Season 2026
-// Tracks which description variant (Royal/Modern/Emotional) leads to Add to Cart
 model VariantEvent {
   id          String   @id @default(uuid())
-  sessionId   String                         // Anonymous browser session
-  productId   String                         // The product being viewed
-  variantKey  String                         // "royal" | "modern" | "emotional"
-  event       String                         // "view" | "add_to_cart"
+  sessionId   String
+  productId   String
+  variantKey  String   // "royal" | "modern" | "emotional"
+  event       String   // "view" | "add_to_cart"
   createdAt   DateTime @default(now())
 
   @@index([productId, variantKey, event])

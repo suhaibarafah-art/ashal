@@ -23,6 +23,7 @@ interface CheckoutClientProps {
   product: Product;
   moyasarKey: string;
   siteUrl: string;
+  initialCoupon?: string;
 }
 
 declare global {
@@ -39,11 +40,11 @@ const CITIES = [
   'نجران', 'جازان', 'ينبع', 'الجبيل', 'الأحساء',
 ];
 
-export default function CheckoutClient({ product, moyasarKey, siteUrl }: CheckoutClientProps) {
+export default function CheckoutClient({ product, moyasarKey, siteUrl, initialCoupon = '' }: CheckoutClientProps) {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
-  const [form, setForm] = useState({ name: '', phone: '', city: '', address: '', coupon: '' });
+  const [form, setForm] = useState({ name: '', phone: '', city: '', address: '', coupon: initialCoupon });
   const [couponStatus, setCouponStatus] = useState<{ applied: boolean; code: string; discount: number } | null>(null);
   const [orderId, setOrderId] = useState('');
   const [finalAmount, setFinalAmount] = useState(product.finalPrice);
@@ -288,7 +289,7 @@ export default function CheckoutClient({ product, moyasarKey, siteUrl }: Checkou
                     <input
                       type="text"
                       className="input-luxury"
-                      placeholder="SAVE10 / ROYAL20 / VIP15"
+                      placeholder="LUXURY10 / SAVE10 / ROYAL20"
                       value={form.coupon}
                       onChange={e => setForm(f => ({ ...f, coupon: e.target.value.toUpperCase() }))}
                       style={{ flex: 1, textTransform: 'uppercase' }}

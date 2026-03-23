@@ -6,6 +6,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { sendTelegramAlert as telegramAlert } from '@/lib/telegram';
+import { cjCreateOrder } from '@/lib/cj-supplier';
 
 export async function processOrderAutomation(orderId: string) {
   try {
@@ -18,8 +19,14 @@ export async function processOrderAutomation(orderId: string) {
 
     console.log(`🤖 CTO-Mode: Processing Order ${orderId} for product ${order.product.titleAr}`);
 
-    // 1. Submit to Supplier (CJ Dropshipping real API or simulation)
-    const supplierResponse = await submitToSupplier(order.product.titleEn, order.customerCity ?? 'Riyadh');
+    // 1. Submit to Supplier (CJ Dropshipping — real OAuth token or simulation fallback)
+    const supplierResponse = await cjCreateOrder({
+      orderNumber: `SL-${orderId.slice(-8).toUpperCase()}`,
+      shippingCountry: 'SA',
+      shippingCity: order.customerCity ?? 'Riyadh',
+      productName: order.product.titleEn,
+      quantity: 1,
+    });
 
     // 2. Initialize Logistic Bot
     await prisma.logisticBot.create({
@@ -36,7 +43,7 @@ export async function processOrderAutomation(orderId: string) {
       where: { id: orderId },
       data: {
         paymentStatus: "PAID_AND_ORDERED",
-        trackingNumber: supplierResponse.tracking,
+        trackingNumber: supplierResponse.trackingNumber,
       }
     });
 
@@ -51,7 +58,7 @@ export async function processOrderAutomation(orderId: string) {
         productTitleAr: order.product.titleAr,
         productTitleEn: order.product.titleEn,
         totalAmount: Number(order.totalAmount),
-        trackingNumber: supplierResponse.tracking,
+        trackingNumber: supplierResponse.trackingNumber,
         city: order.customerCity ?? '',
       });
     }
@@ -62,23 +69,23 @@ export async function processOrderAutomation(orderId: string) {
       order.customerName ?? 'عزيزي العميل',
       order.product.titleAr,
       orderId,
-      supplierResponse.tracking
+      supplierResponse.trackingNumber ?? ''
     );
 
     // 6. Telegram alert to admin
-    await telegramAlert('SALE', `طلب جديد\n🆔 ${order.id.slice(-8).toUpperCase()}\n🛍️ ${order.product.titleAr}\n💰 ${Number(order.totalAmount).toFixed(2)} SAR\n📦 تتبع: ${supplierResponse.tracking}`);
+    await telegramAlert('SALE', `طلب جديد\n🆔 ${order.id.slice(-8).toUpperCase()}\n🛍️ ${order.product.titleAr}\n💰 ${Number(order.totalAmount).toFixed(2)} SAR\n📦 تتبع: ${supplierResponse.trackingNumber}`);
 
     // 7. Log success to SystemLog
     await prisma.systemLog.create({
       data: {
         level: 'SUCCESS',
         source: 'OrderAutomation',
-        message: `Order ${orderId} automated — tracking: ${supplierResponse.tracking}`,
+        message: `Order ${orderId} automated — tracking: ${supplierResponse.trackingNumber}`,
       }
     });
 
-    console.log(`✅ Order ${orderId} automated with tracking: ${supplierResponse.tracking}`);
-    return { success: true, trackingNumber: supplierResponse.tracking };
+    console.log(`✅ Order ${orderId} automated with tracking: ${supplierResponse.trackingNumber}`);
+    return { success: true, trackingNumber: supplierResponse.trackingNumber };
 
   } catch (error) {
     console.error("Order Automation Failure:", error);
@@ -144,7 +151,7 @@ async function sendWhatsAppNotification(
 ) {
   const token = process.env.WHATSAPP_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
 
   if (!token || !phoneNumberId || token === 'placeholder') {
     console.log(`[WhatsApp] No token — would notify ${phone} for order ${orderId}`);

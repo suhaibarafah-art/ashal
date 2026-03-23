@@ -9,8 +9,15 @@ import CheckoutClient from './CheckoutClient';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CheckoutPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function CheckoutPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ coupon?: string }>;
+}) {
+  const { id }      = await params;
+  const { coupon }  = await searchParams;
 
   const product = await prisma.product.findUnique({ where: { id } });
   if (!product) notFound();
@@ -29,6 +36,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
       }}
       moyasarKey={process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY ?? ''}
       siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store'}
+      initialCoupon={coupon ?? ''}
     />
   );
 }

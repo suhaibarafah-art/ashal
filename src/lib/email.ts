@@ -35,7 +35,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
     return { success: false, reason: 'no_email' };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
   const trackingUrl = `${siteUrl}/orders/${data.orderId}`;
 
   const html = `
@@ -163,7 +163,7 @@ export async function sendShippingUpdateEmail(data: OrderEmailData) {
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'test') return;
   if (!data.customerEmail) return;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
   const trackingUrl = `${siteUrl}/orders/${data.orderId}`;
 
   await getResend().emails.send({

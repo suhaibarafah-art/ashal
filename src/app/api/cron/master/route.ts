@@ -1,0 +1,205 @@
+/**
+ * Master Daily Cron — GET /api/cron/master
+ * Called by Vercel cron (Hobby plan: 1 slot only) at 06:00 UTC daily.
+ *
+ * Sequence:
+ *  1. Titan-5 agents  (Scout → Copywriter → Critic → Strategist → CEO)
+ *  2. Abandoned cart recovery  (4h reminder + 24h discount)
+ *  3. Trust builder            (review request 5 days post-order)
+ *  4. Empire engine            (safe dynamic pricing — never below 20% margin)
+ *  5. Telegram daily summary   (CEO morning briefing)
+ */
+
+import { NextResponse } from 'next/server';
+import { runTitan5 }     from '@/lib/agents/titan5';
+import { prisma }        from '@/lib/prisma';
+import { sendTelegramAlert, alertCritical } from '@/lib/telegram';
+
+export const dynamic = 'force-dynamic';
+
+// ─── 1. Abandoned Cart Recovery ──────────────────────────────────────────────
+
+async function runAbandonedCartRecovery(): Promise<{ remindersSent: number; discountsSent: number }> {
+  const carts = await prisma.abandonedCart.findMany({ where: { status: 'pending' } });
+  const now = new Date();
+  let remindersSent = 0, discountsSent = 0;
+
+  for (const cart of carts) {
+    const hoursDiff = (now.getTime() - new Date(cart.createdAt).getTime()) / 3_600_000;
+    const contact   = cart.phone ?? cart.email ?? 'unknown';
+
+    if (hoursDiff >= 4 && hoursDiff < 24 && !cart.remindedAt) {
+      // First nudge — WhatsApp if phone exists
+      if (cart.phone) await sendWhatsAppRecovery(cart.phone, null, 'reminder');
+      await prisma.abandonedCart.update({ where: { id: cart.id }, data: { remindedAt: now } });
+      remindersSent++;
+      await prisma.systemLog.create({ data: { level: 'INFO', source: 'cron/master/cart', message: `4h reminder → ${contact}` } });
+    } else if (hoursDiff >= 24 && cart.status === 'pending') {
+      if (cart.phone) await sendWhatsAppRecovery(cart.phone, 'SOVEREIGN10', 'discount');
+      await prisma.abandonedCart.update({
+        where: { id: cart.id },
+        data: { status: 'discount_sent', discountCode: 'SOVEREIGN10' },
+      });
+      discountsSent++;
+      await prisma.systemLog.create({ data: { level: 'INFO', source: 'cron/master/cart', message: `24h discount SOVEREIGN10 → ${contact}` } });
+    }
+  }
+
+  return { remindersSent, discountsSent };
+}
+
+// ─── 2. Trust Builder (5-day review request) ─────────────────────────────────
+
+async function runTrustBuilder(): Promise<{ requestsSent: number }> {
+  const fiveDaysAgo = new Date(Date.now() - 5 * 86_400_000);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
+
+  // Orders delivered/shipped 5-7 days ago (catch the window, not re-send endlessly)
+  const orders = await prisma.order.findMany({
+    where: {
+      paymentStatus: { in: ['SHIPPED', 'DELIVERED', 'PAID_AND_ORDERED'] },
+      createdAt: { lte: fiveDaysAgo, gte: sevenDaysAgo },
+    },
+    include: { product: { select: { titleAr: true } } },
+  });
+
+  let requestsSent = 0;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
+
+  for (const order of orders) {
+    if (!order.customerPhone) continue;
+    await sendWhatsAppText(
+      order.customerPhone,
+      `طال عمرك ${order.customerName ?? ''}! 🌟\n\nمر 5 أيام على استلامك *${order.product.titleAr}*.\n\nيهمنا رأيك جداً — صوّر المنتج وأرسله لنا وتحصل على كود خصم 15% على طلبك القادم 🎁\n\nتابع طلبك: ${siteUrl}/orders/${order.id}`,
+    );
+    await prisma.systemLog.create({ data: { level: 'INFO', source: 'cron/master/trust', message: `Review request → ${order.customerPhone} — ${order.product.titleAr}` } });
+    requestsSent++;
+  }
+
+  return { requestsSent };
+}
+
+// ─── 3. Empire Engine (safe dynamic pricing) ─────────────────────────────────
+
+async function runEmpireEngine(): Promise<{ adjustments: number; whiteLabelAlerts: number }> {
+  let adjustments = 0, whiteLabelAlerts = 0;
+
+  const products = await prisma.product.findMany({ include: { orders: { select: { id: true } } } });
+
+  for (const product of products) {
+    // White-label alert at 100+ orders (realistic threshold vs 500)
+    if (product.orders.length >= 100 && product.orders.length % 50 === 0) {
+      await sendTelegramAlert('SUCCESS',
+        `🏷️ White-Label Radar\n\n📦 ${product.titleAr}\n📊 ${product.orders.length} طلب مكتمل\nحان وقت الطلب بالجملة وطباعة البراند!`
+      );
+      whiteLabelAlerts++;
+    }
+
+    // Safe dynamic pricing: only adjust if margin after change stays ≥ 20%
+    const minAllowed = (product.baseCost + product.shippingCost) * 1.20;
+    const simulatedCompetitor = product.finalPrice * 0.97; // competitor ~3% cheaper
+    const proposed = simulatedCompetitor - 1;
+
+    if (proposed > minAllowed && proposed < product.finalPrice) {
+      await prisma.product.update({
+        where: { id: product.id },
+        data: { finalPrice: parseFloat(proposed.toFixed(2)) },
+      });
+      await prisma.systemLog.create({ data: { level: 'INFO', source: 'cron/master/empire', message: `Price adjusted ${product.titleEn}: ${product.finalPrice.toFixed(2)} → ${proposed.toFixed(2)} SAR` } });
+      adjustments++;
+    }
+  }
+
+  return { adjustments, whiteLabelAlerts };
+}
+
+// ─── WhatsApp helpers ─────────────────────────────────────────────────────────
+
+async function sendWhatsAppText(phone: string, message: string): Promise<void> {
+  const token   = process.env.WHATSAPP_TOKEN;
+  const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  if (!token || !phoneId || token === 'placeholder') {
+    console.log(`[WhatsApp-cron] No token — would send to ${phone}`);
+    return;
+  }
+  const intl = phone.replace(/\D/g, '').replace(/^0/, '966');
+  await fetch(`https://graph.facebook.com/v18.0/${phoneId}/messages`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messaging_product: 'whatsapp', to: intl, type: 'text', text: { body: message } }),
+  }).catch(console.error);
+}
+
+async function sendWhatsAppRecovery(phone: string, code: string | null, type: 'reminder' | 'discount'): Promise<void> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
+  const msg = type === 'reminder'
+    ? `مرحباً! 👋 لاحظنا إنك تركت بعض المنتجات الفاخرة في سلة التسوق.\n\nاكملي طلبك الآن وتمتعي بالتوصيل خلال 48 ساعة 🚀\n${siteUrl}`
+    : `هدية خاصة لك! 🎁\n\nكود الخصم الحصري: *${code}*\nخصم 10% على طلبك الآن!\n\nالعرض ينتهي خلال 24 ساعة ⏰\n${siteUrl}`;
+  await sendWhatsAppText(phone, msg);
+}
+
+// ─── Main GET Handler ─────────────────────────────────────────────────────────
+
+export async function GET() {
+  const masterStart = Date.now();
+  const results: Record<string, unknown> = {};
+
+  // 1. Titan-5
+  try {
+    const report = await runTitan5();
+    results.titan5 = { success: true, productsUpserted: report.productsUpserted, totalMs: report.totalDurationMs };
+    await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/master', message: `Titan-5 complete — ${report.productsUpserted} products upserted` } });
+  } catch (e) {
+    results.titan5 = { success: false, error: String(e) };
+    await alertCritical('cron/master → titan5', String(e));
+  }
+
+  // 2. Abandoned cart recovery
+  try {
+    results.cartRecovery = await runAbandonedCartRecovery();
+  } catch (e) {
+    results.cartRecovery = { success: false, error: String(e) };
+  }
+
+  // 3. Trust builder
+  try {
+    results.trustBuilder = await runTrustBuilder();
+  } catch (e) {
+    results.trustBuilder = { success: false, error: String(e) };
+  }
+
+  // 4. Empire engine
+  try {
+    results.empireEngine = await runEmpireEngine();
+  } catch (e) {
+    results.empireEngine = { success: false, error: String(e) };
+  }
+
+  const totalMs = Date.now() - masterStart;
+
+  // 5. Daily Telegram briefing to CEO
+  const titan5 = results.titan5 as { productsUpserted?: number; totalMs?: number };
+  const cart   = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
+  const trust  = results.trustBuilder as { requestsSent?: number };
+  const empire = results.empireEngine as { adjustments?: number; whiteLabelAlerts?: number };
+
+  await sendTelegramAlert('SUCCESS',
+    `📊 *التقرير اليومي — Ashal Empire*\n\n` +
+    `🤖 Titan-5: ${titan5.productsUpserted ?? 0} منتج محدّث\n` +
+    `🛒 عربات مهجورة: ${(cart.remindersSent ?? 0)} تذكير + ${(cart.discountsSent ?? 0)} خصم\n` +
+    `⭐ طلبات تقييم: ${trust.requestsSent ?? 0} رسالة\n` +
+    `💹 تعديلات السعر: ${empire.adjustments ?? 0} منتج\n` +
+    `⏱️ المدة الكلية: ${(totalMs / 1000).toFixed(1)}s`
+  ).catch(() => {});
+
+  await prisma.systemLog.create({
+    data: {
+      level: 'SUCCESS',
+      source: 'cron/master',
+      message: `Master cron complete in ${totalMs}ms`,
+      metadata: JSON.stringify(results),
+    },
+  });
+
+  return NextResponse.json({ success: true, totalMs, results });
+}
