@@ -97,6 +97,11 @@ export default async function AdminPage() {
               ⚔️ War Room
             </button>
           </Link>
+          <Link href="/admin/control-room">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(201,168,76,0.2)', color: '#F5D06E', border: '1px solid rgba(201,168,76,0.45)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              🎯 غرفة التحكم
+            </button>
+          </Link>
           <Link href="/admin/monitor">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(134,239,172,0.15)', color: '#86EFAC', border: '1px solid rgba(134,239,172,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
               📡 مراقبة
