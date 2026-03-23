@@ -262,10 +262,10 @@ const UNSPLASH = {
 function simulateCJ(keyword: string): ScoutProduct[] {
   const catalog = [
     { title: 'Luxury Genuine Leather Handbag Premium', cost: 28, img: UNSPLASH.bag, cat: 'Bags' },
-    { title: 'Gold-Plated Crystal Statement Necklace', cost: 22, img: UNSPLASH.jewel, cat: 'Jewelry' },
+    { title: 'Gold-Plated Crystal Statement Necklace', cost: 25, img: UNSPLASH.jewel, cat: 'Jewelry' },
     { title: 'Designer Automatic Mechanical Watch', cost: 45, img: UNSPLASH.watch, cat: 'Watches' },
     { title: 'Premium Oud Perfume Spray 100ml', cost: 30, img: UNSPLASH.scent, cat: 'Fragrance' },
-    { title: 'Silk Evening Clutch Bag Gold Chain', cost: 18, img: UNSPLASH.bag, cat: 'Bags' },
+    { title: 'Silk Evening Clutch Bag Gold Chain', cost: 24, img: UNSPLASH.bag, cat: 'Bags' },
   ];
   return catalog.slice(0, 2).map((p, i) => buildProduct(
     `CJ-SIM-${keyword.slice(0,3).toUpperCase()}-${i}`, p.title, p.img, p.cost, p.cat, keyword, 'CJ'
@@ -274,11 +274,11 @@ function simulateCJ(keyword: string): ScoutProduct[] {
 
 function simulateAliExpress(keyword: string, minCost: number): ScoutProduct[] {
   const catalog = [
-    { title: 'AliExpress Premium Rhinestone Hair Clip Set', cost: 16, img: UNSPLASH.jewel, cat: 'Hair Accessories' },
-    { title: 'Luxury Faux Fur Evening Bag Crossbody', cost: 19, img: UNSPLASH.bag, cat: 'Bags' },
-    { title: 'Gold Plated Adjustable Bangle Bracelets', cost: 17, img: UNSPLASH.jewel, cat: 'Jewelry' },
-    { title: 'Premium Anti-Aging Vitamin C Serum 30ml', cost: 20, img: UNSPLASH.skin, cat: 'Skincare' },
-    { title: 'Elegant Wedding Pearl Hair Pins Set', cost: 15, img: UNSPLASH.jewel, cat: 'Hair Accessories' },
+    { title: 'AliExpress Premium Crystal Hair Crown Set', cost: 25, img: UNSPLASH.jewel, cat: 'Hair Accessories' },
+    { title: 'Luxury Satin Evening Bag Gold Chain', cost: 28, img: UNSPLASH.bag, cat: 'Bags' },
+    { title: 'Gold Plated Statement Bangle Bracelets Set', cost: 24, img: UNSPLASH.jewel, cat: 'Jewelry' },
+    { title: 'Premium Anti-Aging Retinol Serum 30ml', cost: 26, img: UNSPLASH.skin, cat: 'Skincare' },
+    { title: 'Bridal Pearl Tiara Headband Set', cost: 23, img: UNSPLASH.jewel, cat: 'Hair Accessories' },
   ];
   return catalog.filter(p => p.cost >= minCost).slice(0, 2).map((p, i) => buildProduct(
     `ALI-SIM-${keyword.slice(0,3).toUpperCase()}-${i}`, p.title, p.img, p.cost, p.cat, keyword, 'AliExpress'
@@ -288,9 +288,9 @@ function simulateAliExpress(keyword: string, minCost: number): ScoutProduct[] {
 function simulateZendrop(keyword: string, minCost: number): ScoutProduct[] {
   const catalog = [
     { title: 'Zendrop Wireless Bluetooth Earbuds Premium', cost: 25, img: UNSPLASH.watch, cat: 'Electronics' },
-    { title: 'Luxury Collagen Face Mask Set 10pcs', cost: 22, img: UNSPLASH.skin, cat: 'Skincare' },
-    { title: 'Minimalist Gold Hoop Earrings 18K', cost: 18, img: UNSPLASH.jewel, cat: 'Jewelry' },
-    { title: 'Premium Satin Silk Pillowcase Set', cost: 20, img: UNSPLASH.bag, cat: 'Home Luxury' },
+    { title: 'Luxury Collagen Face Mask Set 10pcs', cost: 24, img: UNSPLASH.skin, cat: 'Skincare' },
+    { title: 'Minimalist Gold Hoop Earrings 18K Plated', cost: 25, img: UNSPLASH.jewel, cat: 'Jewelry' },
+    { title: 'Premium Mulberry Silk Pillowcase Set', cost: 28, img: UNSPLASH.bag, cat: 'Home Luxury' },
   ];
   return catalog.filter(p => p.cost >= minCost).slice(0, 2).map((p, i) => buildProduct(
     `ZD-SIM-${keyword.slice(0,3).toUpperCase()}-${i}`, p.title, p.img, p.cost, p.cat, keyword, 'Zendrop'
@@ -319,7 +319,7 @@ export async function GET(req: NextRequest) {
   const config = await getConfig();
   const maxProducts = config.maxProductsPerRun ?? 15;
   const minScore   = config.minLuxuryScore ?? 50;
-  const minCost    = 15; // USD — minimum cost for luxury positioning
+  const minCost    = 23; // USD — min cost so suggestedPrice (cost×2.2) clears Critic's $50 floor
 
   await logAgent('SCOUT', 'بدء البحث متعدد الموردين', 'INFO',
     `CJ + AliExpress + Zendrop + Spocket | ${SEARCH_KEYWORDS.length} كلمة مفتاحية`);
