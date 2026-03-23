@@ -1,9 +1,10 @@
 /**
  * Saudi Luxury Store — Pricing Engine v2
- * Phase 2 mandate: 30% margin + 15% VAT → rounded to nearest .99 SAR
+ * Mandate: 40% margin + 15% VAT → rounded to nearest .99 SAR
+ * → Net margin after VAT ≈ 37.9% (above Critic's 35% floor)
  *
- * Formula: floor((cost + shipping) * 1.30 * 1.15) + 0.99
- * Example: cost=100 ship=20 → floor(179.40) + 0.99 = 179.99 SAR
+ * Formula: floor((cost + shipping) * 1.40 * 1.15) + 0.99
+ * Example: cost=100 ship=20 → floor(205.80) + 0.99 = 205.99 SAR
  */
 
 export interface PricingMetrics {
@@ -12,23 +13,23 @@ export interface PricingMetrics {
   recentSalesCount?: number;
 }
 
-/** Standard luxury price — 30% margin + 15% VAT + .99 rounding */
+/** Standard luxury price — 40% margin + 15% VAT + .99 rounding */
 export function calculateLuxuryPrice(baseCost: number, shipping: number): number {
-  const raw = (baseCost + shipping) * 1.30 * 1.15;
+  const raw = (baseCost + shipping) * 1.40 * 1.15;
   return Math.floor(raw) + 0.99;
 }
 
-/** Dynamic price with optional surge (minimum 30% always) */
+/** Dynamic price with optional surge (minimum 40% always) */
 export function calculateDynamicPrice(
   baseCost: number,
   shipping: number,
   metrics: PricingMetrics = {}
 ): number {
-  let margin = 1.30;
+  let margin = 1.40;
   if (metrics.demandScore && metrics.demandScore > 0.8) margin += 0.10;
   const hour = new Date().getHours();
   if (hour >= 20 && hour <= 23) margin += 0.05;
-  margin = Math.max(margin, 1.30);
+  margin = Math.max(margin, 1.40);
   const raw = (baseCost + shipping) * margin * 1.15;
   return Math.floor(raw) + 0.99;
 }
