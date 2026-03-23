@@ -1,0 +1,91 @@
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 12:05:26"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Jewelry & Accessories","timestamp":"2026-03-21 12:05:26"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Jewelry & Accessories: CJ Auth failed: That's not a valid email address. Please try again. ","timestamp":"2026-03-21 12:05:27"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Watches","timestamp":"2026-03-21 12:05:27"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Watches: Request failed with status code 429","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Bags & Wallets","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Fashion Bags & Wallets: Request failed with status code 429","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Premium Sunglasses","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Premium Sunglasses: Request failed with status code 429","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Tech Accessories","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Smart Tech Accessories: Request failed with status code 429","timestamp":"2026-03-21 12:05:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 12:06:26"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Jewelry & Accessories","timestamp":"2026-03-21 12:06:26"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Using CJ_API_KEY as direct access token","timestamp":"2026-03-21 12:06:26"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Jewelry & Accessories: Request failed with status code 401","timestamp":"2026-03-21 12:06:27"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Watches","timestamp":"2026-03-21 12:06:27"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Watches: Request failed with status code 401","timestamp":"2026-03-21 12:06:27"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Bags & Wallets","timestamp":"2026-03-21 12:06:27"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Fashion Bags & Wallets: Request failed with status code 401","timestamp":"2026-03-21 12:06:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Premium Sunglasses","timestamp":"2026-03-21 12:06:28"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Premium Sunglasses: Request failed with status code 401","timestamp":"2026-03-21 12:06:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Tech Accessories","timestamp":"2026-03-21 12:06:28"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Smart Tech Accessories: Request failed with status code 401","timestamp":"2026-03-21 12:06:28"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 20:37:15"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Jewelry & Accessories","timestamp":"2026-03-21 20:37:15"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Using CJ_API_KEY as direct access token","timestamp":"2026-03-21 20:37:15"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Jewelry & Accessories: Request failed with status code 401","timestamp":"2026-03-21 20:37:16"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Watches","timestamp":"2026-03-21 20:37:16"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Watches: Request failed with status code 401","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Bags & Wallets","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Fashion Bags & Wallets: Request failed with status code 401","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Premium Sunglasses","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Premium Sunglasses: Request failed with status code 401","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Tech Accessories","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Smart Tech Accessories: Request failed with status code 401","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🏆 Scout complete. 0 high-potential products identified from 0 scanned.","timestamp":"2026-03-21 20:37:17"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 20:38:06"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Jewelry & Accessories","timestamp":"2026-03-21 20:38:06"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Jewelry & Accessories: Request failed with status code 429","timestamp":"2026-03-21 20:38:07"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Watches","timestamp":"2026-03-21 20:38:07"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Watches: Request failed with status code 429","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Bags & Wallets","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Fashion Bags & Wallets: Request failed with status code 429","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Premium Sunglasses","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Premium Sunglasses: Request failed with status code 429","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Tech Accessories","timestamp":"2026-03-21 20:38:08"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Smart Tech Accessories: Request failed with status code 429","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🏆 Scout complete. 0 high-potential products identified from 0 scanned.","timestamp":"2026-03-21 20:38:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 20:45:56"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Jewelry & Accessories","timestamp":"2026-03-21 20:45:56"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Using pre-fetched CJ_ACCESS_TOKEN","timestamp":"2026-03-21 20:45:56"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Watches","timestamp":"2026-03-21 20:45:58"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Watches: Request failed with status code 429","timestamp":"2026-03-21 20:45:58"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Bags & Wallets","timestamp":"2026-03-21 20:45:58"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Fashion Bags & Wallets: Request failed with status code 429","timestamp":"2026-03-21 20:45:58"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Premium Sunglasses","timestamp":"2026-03-21 20:45:58"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Premium Sunglasses: Request failed with status code 429","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Tech Accessories","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🏆 Scout complete. 0 high-potential products identified from 0 scanned.","timestamp":"2026-03-21 20:45:59"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🔍 Scout Agent activated — hunting luxury products...","timestamp":"2026-03-21 20:54:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Fashion Jewelry Sets","timestamp":"2026-03-21 20:54:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Using pre-fetched CJ_ACCESS_TOKEN","timestamp":"2026-03-21 20:54:09"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: 925 Silver Jewelry","timestamp":"2026-03-21 20:54:11"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category 925 Silver Jewelry: Request failed with status code 429","timestamp":"2026-03-21 20:54:11"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Quartz Watches","timestamp":"2026-03-21 20:54:11"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Quartz Watches: Request failed with status code 429","timestamp":"2026-03-21 20:54:11"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Watches","timestamp":"2026-03-21 20:54:11"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Crossbody Bags","timestamp":"2026-03-21 20:54:12"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Crossbody Bags: Request failed with status code 429","timestamp":"2026-03-21 20:54:12"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Man Wallets","timestamp":"2026-03-21 20:54:12"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Man Wallets: Request failed with status code 429","timestamp":"2026-03-21 20:54:12"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Smart Home Appliances","timestamp":"2026-03-21 20:54:12"}
+{"agent":"Scout Agent","level":"\u001b[31merror\u001b[39m","message":"Failed to scan CJ category Smart Home Appliances: Request failed with status code 429","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"Scanning CJ category: Earphones & Headphones","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"AliExpress keys not configured, skipping","timestamp":"2026-03-21 20:54:13"}
+{"agent":"Scout Agent","level":"\u001b[32minfo\u001b[39m","message":"🏆 Scout complete. 0 high-potential products identified from 0 scanned.","timestamp":"2026-03-21 20:54:13"}
