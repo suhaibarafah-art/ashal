@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       address?:        string;
       amount:          number | string;
       couponCode?:     string;
-      paymentMethod?:  'online' | 'cod';
+      paymentMethod?:  'online' | 'cod' | 'tabby' | 'tamara';
     };
 
     const { productId, phone, city } = body;
@@ -69,7 +69,10 @@ export async function POST(req: NextRequest) {
         customerAddress: body.address ?? '',
         totalAmount,
         discountAmount,
-        paymentStatus:   body.paymentMethod === 'cod' ? 'PENDING_COD' : 'PENDING',
+        paymentStatus:   body.paymentMethod === 'cod' ? 'PENDING_COD'
+                     : body.paymentMethod === 'tabby' ? 'PENDING_TABBY'
+                     : body.paymentMethod === 'tamara' ? 'PENDING_TAMARA'
+                     : 'PENDING',
         ...(couponId ? { couponId } : {}),
       }
     });

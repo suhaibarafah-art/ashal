@@ -255,6 +255,13 @@ model AgentTaskQueue {
   @@index([cjProductId])
 }
 
+// Key-value store for agent config, logs, queues, CJ token
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 // DailyReport — written by Agent 10 (Analyst) every 06:00 AM
 model DailyReport {
   id               String   @id @default(uuid())

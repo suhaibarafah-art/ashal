@@ -35,8 +35,10 @@ export default async function CheckoutPage({
         supplier: p.supplier ?? 'cj',
       }}
       moyasarKey={process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY ?? ''}
-      siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store'}
+      siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ashal-three.vercel.app'}
       initialCoupon={coupon ?? ''}
+      tabbyEnabled={!!process.env.TABBY_SECRET_KEY}
+      tamaraEnabled={!!process.env.TAMARA_API_TOKEN}
     />
   );
 }
