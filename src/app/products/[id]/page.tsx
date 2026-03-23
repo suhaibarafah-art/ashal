@@ -69,10 +69,10 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{product.titleAr}</span>
         </nav>
 
-        {/* Main 2-col grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        {/* Main 2-col grid — dir=ltr forces Image LEFT, Info RIGHT on all locales */}
+        <div dir="ltr" className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
-          {/* ── Image ── */}
+          {/* ── Image ── LEFT column */}
           <div>
             <div
               className="w-full rounded-xl overflow-hidden"
@@ -93,8 +93,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
 
-          {/* ── Product Info ── */}
-          <div className="flex flex-col gap-5">
+          {/* ── Product Info ── RIGHT column, text stays RTL */}
+          <div dir="rtl" className="flex flex-col gap-5">
 
             {/* Shipping + stock tags */}
             <div className="flex items-center gap-3 flex-wrap">

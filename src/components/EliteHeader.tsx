@@ -31,7 +31,7 @@ export default function EliteHeader() {
         variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
         animate={hidden ? "hidden" : "visible"}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 w-full z-[60]"
+        className="fixed top-0 inset-x-0 w-full z-[60]"
         style={{ backgroundColor: '#002366', boxShadow: scrolled ? '0 4px 20px rgba(27,42,107,0.5)' : 'none' }}
       >
         {/* Announcement Bar — Orange */}

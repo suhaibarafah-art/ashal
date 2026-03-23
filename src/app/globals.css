@@ -116,7 +116,6 @@ a {
   font-family: var(--font-arabic);
   font-weight: 700;
   font-size: 15px;
-  letter-spacing: 0.05em;
   padding: 14px 36px;
   border: 2px solid var(--color-orange);
   border-radius: 6px;
@@ -262,10 +261,10 @@ a {
   padding: 24px 28px;
   box-shadow: var(--shadow-card);
 }
-.kpi-card.kpi-orange { border-left: 4px solid var(--color-orange); }
-.kpi-card.kpi-blue   { border-left: 4px solid var(--color-blue); }
-.kpi-card.kpi-mustard{ border-left: 4px solid var(--color-mustard); }
-.kpi-card.kpi-green  { border-left: 4px solid #22C55E; }
+.kpi-card.kpi-orange { border-inline-start: 4px solid var(--color-orange); }
+.kpi-card.kpi-blue   { border-inline-start: 4px solid var(--color-blue); }
+.kpi-card.kpi-mustard{ border-inline-start: 4px solid var(--color-mustard); }
+.kpi-card.kpi-green  { border-inline-start: 4px solid #22C55E; }
 
 /* GlassCard legacy */
 .glass-card {
