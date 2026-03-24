@@ -5,6 +5,7 @@ import AiAssistant from "@/components/AiAssistant";
 import AIVIPWidget from "@/components/AIVIPWidget";
 import EmpireFooter from "@/components/EmpireFooter";
 import EliteHeader from "@/components/EliteHeader";
+import ThemeProvider from "@/components/ThemeProvider";
 
 // Arabic: Cairo Bold — modern Saudi feel, high-legibility
 const cairo = Cairo({
@@ -53,11 +54,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={`${cairo.variable} ${montserrat.variable} antialiased`}>
-        <EliteHeader />
-        {children}
-        <EmpireFooter />
-        <AiAssistant />
-        <AIVIPWidget />
+        <ThemeProvider>
+          <EliteHeader />
+          {children}
+          <EmpireFooter />
+          <AiAssistant />
+          <AIVIPWidget />
+        </ThemeProvider>
       </body>
     </html>
   );

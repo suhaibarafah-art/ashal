@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
+import ThemeToggle from './ThemeToggle';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
@@ -106,6 +107,9 @@ export default function EliteHeader() {
               </svg>
               بحث
             </button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Cart — Orange CTA */}
             <button

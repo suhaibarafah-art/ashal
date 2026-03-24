@@ -63,6 +63,30 @@
   --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ═══════════════════════════════ DARK MODE ═══════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-primary:    #0d0d1a;
+  --bg-secondary:  #13131f;
+  --bg-tertiary:   #1a1a2e;
+
+  --text-primary:   #f0f0f8;
+  --text-secondary: #c8c8d8;
+  --text-muted:     #7878a0;
+
+  --border-color:  #2a2a42;
+  --border-dark:   #3a3a55;
+  --border-orange: rgba(255, 140, 0, 0.35);
+  --border-blue:   rgba(100, 130, 220, 0.3);
+
+  --shadow-card:   0 2px 16px rgba(0, 0, 0, 0.5);
+  --shadow-orange: 0 4px 20px rgba(255, 140, 0, 0.25);
+  --shadow-blue:   0 4px 20px rgba(50, 80, 200, 0.22);
+
+  --color-blue-ghost:    rgba(100, 130, 255, 0.08);
+  --color-mustard-ghost: rgba(255, 219, 88, 0.15);
+  --color-orange-ghost:  rgba(255, 140, 0, 0.12);
+}
+
 /* ═══════════════════════════════════════ BASE ═══════════════════════════════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -81,6 +105,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6, .logo {
