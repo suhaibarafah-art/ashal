@@ -14,6 +14,7 @@ import { NextResponse } from 'next/server';
 import { runTitan5 }     from '@/lib/agents/titan5';
 import { prisma }        from '@/lib/prisma';
 import { sendTelegramAlert, alertCritical } from '@/lib/telegram';
+import { processOrderAutomation } from '@/lib/order-automation';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,6 +114,81 @@ async function runEmpireEngine(): Promise<{ adjustments: number; whiteLabelAlert
   return { adjustments, whiteLabelAlerts };
 }
 
+// ─── 0. Order Lifecycle Automation ───────────────────────────────────────────
+// Runs before everything else — fixes stuck orders & progresses statuses automatically
+
+async function runOrderLifecycle(): Promise<{
+  codFixed: number; pendingExpired: number; toFulfilling: number;
+  toShipped: number; toDelivered: number;
+}> {
+  const now = Date.now();
+  let codFixed = 0, pendingExpired = 0, toFulfilling = 0, toShipped = 0, toDelivered = 0;
+
+  // 1. PENDING_COD → trigger automation (payment is on delivery, treat as paid)
+  const codOrders = await prisma.order.findMany({
+    where: { paymentStatus: { in: ['PENDING_COD'] } },
+  });
+  for (const o of codOrders) {
+    await prisma.order.update({ where: { id: o.id }, data: { paymentStatus: 'PAID', updatedAt: new Date() } });
+    await processOrderAutomation(o.id).catch(() => {});
+    codFixed++;
+  }
+
+  // 2. PENDING / PENDING_TABBY / PENDING_TAMARA > 2h → FAILED (payment abandoned)
+  const twoHoursAgo = new Date(now - 2 * 3_600_000);
+  const expiredOrders = await prisma.order.findMany({
+    where: {
+      paymentStatus: { in: ['PENDING', 'PENDING_TABBY', 'PENDING_TAMARA'] },
+      createdAt: { lt: twoHoursAgo },
+    },
+  });
+  for (const o of expiredOrders) {
+    await prisma.order.update({ where: { id: o.id }, data: { paymentStatus: 'FAILED', updatedAt: new Date() } });
+    await prisma.systemLog.create({ data: { level: 'WARN', source: 'cron/order-lifecycle', message: `Order ${o.id} expired — payment not completed` } }).catch(() => {});
+    pendingExpired++;
+  }
+
+  // 3. PAID_AND_ORDERED > 6h → FULFILLING (supplier confirmed, warehouse picking)
+  const sixHoursAgo = new Date(now - 6 * 3_600_000);
+  const orderedOrders = await prisma.order.findMany({
+    where: { paymentStatus: 'PAID_AND_ORDERED', updatedAt: { lt: sixHoursAgo } },
+  });
+  for (const o of orderedOrders) {
+    await prisma.order.update({ where: { id: o.id }, data: { paymentStatus: 'FULFILLING', updatedAt: new Date() } });
+    toFulfilling++;
+  }
+
+  // 4. FULFILLING > 3 days → SHIPPED (CJ average dispatch time)
+  const threeDaysAgo = new Date(now - 3 * 86_400_000);
+  const fulfillingOrders = await prisma.order.findMany({
+    where: { paymentStatus: 'FULFILLING', updatedAt: { lt: threeDaysAgo } },
+  });
+  for (const o of fulfillingOrders) {
+    await prisma.order.update({ where: { id: o.id }, data: { paymentStatus: 'SHIPPED', updatedAt: new Date() } });
+    toShipped++;
+  }
+
+  // 5. SHIPPED > 7 days → DELIVERED (Saudi average delivery window)
+  const sevenDaysAgo = new Date(now - 7 * 86_400_000);
+  const shippedOrders = await prisma.order.findMany({
+    where: { paymentStatus: 'SHIPPED', updatedAt: { lt: sevenDaysAgo } },
+  });
+  for (const o of shippedOrders) {
+    await prisma.order.update({ where: { id: o.id }, data: { paymentStatus: 'DELIVERED', updatedAt: new Date() } });
+    toDelivered++;
+  }
+
+  await prisma.systemLog.create({
+    data: {
+      level: 'INFO',
+      source: 'cron/order-lifecycle',
+      message: `Lifecycle: COD→auto:${codFixed} | expired:${pendingExpired} | fulfilling:${toFulfilling} | shipped:${toShipped} | delivered:${toDelivered}`,
+    },
+  }).catch(() => {});
+
+  return { codFixed, pendingExpired, toFulfilling, toShipped, toDelivered };
+}
+
 // ─── WhatsApp helpers ─────────────────────────────────────────────────────────
 
 async function sendWhatsAppText(phone: string, message: string): Promise<void> {
@@ -155,6 +231,13 @@ export async function GET(req: import('next/server').NextRequest) {
   const masterStart = Date.now();
   const results: Record<string, unknown> = {};
 
+  // 0. Order lifecycle automation (runs first — fixes stuck orders)
+  try {
+    results.orderLifecycle = await runOrderLifecycle();
+  } catch (e) {
+    results.orderLifecycle = { success: false, error: String(e) };
+  }
+
   // 1. Titan-5
   try {
     const report = await runTitan5();
@@ -189,13 +272,15 @@ export async function GET(req: import('next/server').NextRequest) {
   const totalMs = Date.now() - masterStart;
 
   // 5. Daily Telegram briefing to CEO
-  const titan5 = results.titan5 as { productsUpserted?: number; totalMs?: number };
-  const cart   = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
-  const trust  = results.trustBuilder as { requestsSent?: number };
-  const empire = results.empireEngine as { adjustments?: number; whiteLabelAlerts?: number };
+  const titan5    = results.titan5 as { productsUpserted?: number; totalMs?: number };
+  const cart      = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
+  const trust     = results.trustBuilder as { requestsSent?: number };
+  const empire    = results.empireEngine as { adjustments?: number; whiteLabelAlerts?: number };
+  const lifecycle = results.orderLifecycle as { codFixed?: number; pendingExpired?: number; toFulfilling?: number; toShipped?: number; toDelivered?: number };
 
   await sendTelegramAlert('SUCCESS',
     `📊 *التقرير اليومي — Ashal Empire*\n\n` +
+    `📦 دورة الطلبات: COD✅${lifecycle.codFixed ?? 0} | منتهية🚫${lifecycle.pendingExpired ?? 0} | شحن🚚${lifecycle.toShipped ?? 0} | وصلت🏠${lifecycle.toDelivered ?? 0}\n` +
     `🤖 Titan-5: ${titan5.productsUpserted ?? 0} منتج محدّث\n` +
     `🛒 عربات مهجورة: ${(cart.remindersSent ?? 0)} تذكير + ${(cart.discountsSent ?? 0)} خصم\n` +
     `⭐ طلبات تقييم: ${trust.requestsSent ?? 0} رسالة\n` +
