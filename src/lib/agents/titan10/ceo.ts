@@ -8,6 +8,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendTelegramAlert } from '@/lib/telegram';
 import { calculateLuxuryPrice } from '@/lib/pricing-engine';
+import { detectCategory } from './copywriter';
 
 export async function runCEO(): Promise<{ published: number; errors: number }> {
   let published = 0;
@@ -22,40 +23,53 @@ export async function runCEO(): Promise<{ published: number; errors: number }> {
     try {
       const finalPrice = calculateLuxuryPrice(item.baseCost, item.shippingCost);
 
+      // Parse stockLevel encoded by Scout in agentNotes JSON
+      let stockLevel = 50; // sensible default
+      try {
+        const notes = JSON.parse(item.agentNotes);
+        if (typeof notes?.stockLevel === 'number') stockLevel = notes.stockLevel;
+      } catch { /* agentNotes may not be JSON — keep default */ }
+
+      // Detect product category from English title
+      const category = detectCategory(item.titleEn);
+
       // Upsert into Product table
       const product = await prisma.product.upsert({
         where: { titleEn: item.titleEn },
         update: {
-          titleAr:     item.titleAr || item.titleEn,
-          descAr:      item.descAr,
-          imageUrl:    item.imageUrl,
+          titleAr:      item.titleAr || item.titleEn,
+          descAr:       item.descAr,
+          imageUrl:     item.imageUrl,
           finalPrice,
-          baseCost:    item.baseCost,
+          baseCost:     item.baseCost,
           shippingCost: item.shippingCost,
-          marginPct:   item.marginPct,
+          marginPct:    item.marginPct,
           adCopyTikTok: item.adCopyTikTok,
           adCopySnap:   item.adCopySnap,
           adCopyIG:     item.adCopyIG,
-          supplierSku: item.cjProductId,
-          supplier:    'cj',
-          isHidden:    false,
+          supplierSku:  item.cjProductId,
+          supplier:     'cj',
+          category,
+          stockLevel,
+          isHidden:     false,
         },
         create: {
-          titleEn:     item.titleEn,
-          titleAr:     item.titleAr || item.titleEn,
-          descAr:      item.descAr || item.titleAr || item.titleEn,
-          imageUrl:    item.imageUrl,
+          titleEn:      item.titleEn,
+          titleAr:      item.titleAr || item.titleEn,
+          descAr:       item.descAr || item.titleAr || item.titleEn,
+          imageUrl:     item.imageUrl,
           finalPrice,
-          baseCost:    item.baseCost,
+          baseCost:     item.baseCost,
           shippingCost: item.shippingCost,
-          marginPct:   item.marginPct,
+          marginPct:    item.marginPct,
           adCopyTikTok: item.adCopyTikTok,
           adCopySnap:   item.adCopySnap,
           adCopyIG:     item.adCopyIG,
-          supplierSku: item.cjProductId,
-          supplier:    'cj',
-          category:    'general',
-          isHidden:    false,
+          supplierSku:  item.cjProductId,
+          supplier:     'cj',
+          category,
+          stockLevel,
+          isHidden:     false,
         },
       });
 

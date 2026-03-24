@@ -52,12 +52,103 @@ async function geminiLocalize(titleEn: string): Promise<{ titleAr: string; descA
   }
 }
 
+// Keyword → luxury Arabic content map (no English leakage)
+const KEYWORD_MAP: Array<{
+  keywords: string[];
+  titleAr: string;
+  descAr: string;
+  category: string;
+}> = [
+  {
+    keywords: ['wireless charger', 'wireless charging', 'charger'],
+    titleAr: 'شاحن لاسلكي فائق السرعة بتصميم عصري فاخر',
+    descAr: 'شحن لاسلكي سريع يدعم أحدث الأجهزة الذكية بتقنية متقدمة. تصميم أنيق يليق بغرفتك، توافق شامل مع آيفون وأندرويد، وحماية ذكية من السخونة الزائدة.',
+    category: 'electronics',
+  },
+  {
+    keywords: ['led desk lamp', 'desk lamp', 'led lamp', 'lamp', 'light'],
+    titleAr: 'مصباح مكتب LED ذكي بإضاءة قابلة للتعديل',
+    descAr: 'إضاءة مثالية لمكتبك بتقنية LED موفرة للطاقة. ثلاثة أوضاع إضاءة ودرجات حرارة لونية متعددة لراحة عينيك، مثالي للعمل والدراسة في المنزل.',
+    category: 'home',
+  },
+  {
+    keywords: ['car organizer', 'car', 'auto', 'vehicle'],
+    titleAr: 'منظم سيارة أنيق بسعة تخزين كبيرة',
+    descAr: 'حافظ على ترتيب سيارتك بأسلوب راقٍ. مصنوع من خامات متينة عالية الجودة مع تصميم يناسب جميع موديلات السيارات، يجعل رحلاتك أكثر انتظاماً وأناقة.',
+    category: 'automotive',
+  },
+  {
+    keywords: ['kitchen gadget', 'kitchen', 'cooking', 'food'],
+    titleAr: 'أداة مطبخ ذكية لتجربة طبخ استثنائية',
+    descAr: 'ارتقِ بتجربتك في المطبخ مع هذه الأداة الذكية المصنوعة من مواد غذائية آمنة. تصميم عملي يوفر وقتك وجهدك مع نتائج احترافية في كل مرة.',
+    category: 'kitchen',
+  },
+  {
+    keywords: ['phone stand', 'phone holder', 'stand', 'holder', 'mount'],
+    titleAr: 'حامل هاتف ذكي بتصميم قابل للتعديل',
+    descAr: 'حامل هاتف مريح وأنيق يتيح لك رؤية شاشتك بزاوية مثالية. مناسب لجميع أحجام الهواتف، ثابت وقوي مع قاعدة مضادة للانزلاق.',
+    category: 'accessories',
+  },
+  {
+    keywords: ['bluetooth earbuds', 'earbuds', 'earphones', 'headphones', 'audio', 'bluetooth'],
+    titleAr: 'سماعات بلوتوث لاسلكية بجودة صوت نقية',
+    descAr: 'استمتع بصوت نقي واضح مع سماعات لاسلكية توفر عزل رائع للضوضاء. بطارية تدوم طويلاً، اتصال بلوتوث مستقر، ومناسبة للرياضة والسفر.',
+    category: 'electronics',
+  },
+  {
+    keywords: ['portable fan', 'fan', 'cooling', 'mini fan'],
+    titleAr: 'مروحة محمولة صامتة بأداء تبريد فائق',
+    descAr: 'تبريد فوري أينما كنت بمروحة محمولة صامتة وخفيفة الوزن. ثلاث سرعات للهواء وبطارية تشغيل طويلة، مثالية للمكتب والسفر وأوقات الفراغ.',
+    category: 'home',
+  },
+  {
+    keywords: ['smart home', 'smart', 'iot', 'wifi', 'remote'],
+    titleAr: 'جهاز منزل ذكي يرقى بأسلوب حياتك',
+    descAr: 'تحكم في منزلك بذكاء وسهولة مع تقنية متطورة توفر الراحة والأمان. سهل الإعداد ومتوافق مع الأجهزة الذكية الشائعة لتجربة منزل ذكي متكاملة.',
+    category: 'electronics',
+  },
+  {
+    keywords: ['wallet', 'rfid', 'card holder'],
+    titleAr: 'محفظة جلدية فاخرة بحماية RFID متقدمة',
+    descAr: 'محفظة من الجلد الطبيعي الفاخر مع تقنية حماية RFID لأمان بطاقاتك البنكية. تصميم نحيف أنيق يتسع لبطاقاتك وأوراقك بشكل منظم.',
+    category: 'accessories',
+  },
+  {
+    keywords: ['watch', 'smartwatch', 'band', 'bracelet'],
+    titleAr: 'ساعة ذكية أنيقة بمزايا متقدمة',
+    descAr: 'اجمع بين الأناقة والتقنية مع ساعة ذكية تتابع صحتك ونشاطاتك اليومية. شاشة مشرقة، بطارية تدوم أياماً، ومقاومة للماء لمواكبة أسلوب حياتك.',
+    category: 'electronics',
+  },
+];
+
+function detectCategory(titleEn: string): string {
+  const lower = titleEn.toLowerCase();
+  for (const entry of KEYWORD_MAP) {
+    if (entry.keywords.some(k => lower.includes(k))) {
+      return entry.category;
+    }
+  }
+  return 'general';
+}
+
 function fallbackLocalize(titleEn: string): { titleAr: string; descAr: string } {
+  const lower = titleEn.toLowerCase();
+
+  // Try to match a known keyword
+  for (const entry of KEYWORD_MAP) {
+    if (entry.keywords.some(k => lower.includes(k))) {
+      return { titleAr: entry.titleAr, descAr: entry.descAr };
+    }
+  }
+
+  // Generic luxury fallback — still full Arabic, no English leakage
   return {
-    titleAr: `${titleEn} — إصدار فاخر حصري`,
-    descAr:  `${titleEn} — منتج عالي الجودة مختار بعناية للسوق السعودي. جودة مضمونة، شحن سريع لجميع مناطق المملكة، مع ضمان الرضا التام خلال 14 يوماً.`,
+    titleAr: 'منتج فاخر مختار بعناية للسوق السعودي',
+    descAr:  'منتج عالي الجودة تم اختياره بمعايير صارمة ليناسب ذوق العميل السعودي الراقي. جودة مضمونة وشحن سريع لجميع مناطق المملكة مع ضمان الرضا التام.',
   };
 }
+
+export { detectCategory };
 
 export async function runCopywriter(): Promise<{ written: number; fallback: number; errors: number }> {
   let written = 0;
