@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Never fail Vercel builds on TypeScript or ESLint errors
+  // Never fail Vercel builds on TypeScript errors
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
 
   // Phase 7: Image optimization — allow all external image sources
   images: {

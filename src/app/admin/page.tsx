@@ -113,6 +113,21 @@ export default async function AdminPage() {
               🎵 التسويق
             </button>
           </Link>
+          <Link href="/admin/agents">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(99,102,241,0.2)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              🤖 TITAN-10
+            </button>
+          </Link>
+          <Link href="/admin/suppliers">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(20,184,166,0.2)', color: '#2dd4bf', border: '1px solid rgba(20,184,166,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              🏭 الموردون
+            </button>
+          </Link>
+          <Link href="/admin/system-health">
+            <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(16,185,129,0.2)', color: '#34d399', border: '1px solid rgba(16,185,129,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
+              🩺 صحة النظام
+            </button>
+          </Link>
           <Link href="/admin/system-logs">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(232,118,26,0.2)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', fontFamily: 'var(--font-cairo)', cursor: 'pointer' }}>
               سجلات النظام

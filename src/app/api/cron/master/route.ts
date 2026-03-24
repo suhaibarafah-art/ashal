@@ -11,7 +11,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { runTitan5 }     from '@/lib/agents/titan5';
+import { runTitan10 }    from '@/lib/agents/titan10';
 import { prisma }        from '@/lib/prisma';
 import { sendTelegramAlert, alertCritical } from '@/lib/telegram';
 import { processOrderAutomation } from '@/lib/order-automation';
@@ -238,14 +238,14 @@ export async function GET(req: import('next/server').NextRequest) {
     results.orderLifecycle = { success: false, error: String(e) };
   }
 
-  // 1. Titan-5
+  // 1. Titan-10
   try {
-    const report = await runTitan5();
-    results.titan5 = { success: true, productsUpserted: report.productsUpserted, totalMs: report.totalDurationMs };
-    await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/master', message: `Titan-5 complete — ${report.productsUpserted} products upserted` } });
+    const report = await runTitan10('FULL_PIPELINE');
+    results.titan10 = { success: true, duration: report.duration, pipeline: report.pipeline };
+    await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/master', message: `TITAN-10 complete in ${(report.duration / 1000).toFixed(1)}s` } });
   } catch (e) {
-    results.titan5 = { success: false, error: String(e) };
-    await alertCritical('cron/master → titan5', String(e));
+    results.titan10 = { success: false, error: String(e) };
+    await alertCritical('cron/master → titan10', String(e));
   }
 
   // 2. Abandoned cart recovery
@@ -272,7 +272,7 @@ export async function GET(req: import('next/server').NextRequest) {
   const totalMs = Date.now() - masterStart;
 
   // 5. Daily Telegram briefing to CEO
-  const titan5    = results.titan5 as { productsUpserted?: number; totalMs?: number };
+  const titan10   = results.titan10 as { duration?: number };
   const cart      = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
   const trust     = results.trustBuilder as { requestsSent?: number };
   const empire    = results.empireEngine as { adjustments?: number; whiteLabelAlerts?: number };
@@ -281,7 +281,7 @@ export async function GET(req: import('next/server').NextRequest) {
   await sendTelegramAlert('SUCCESS',
     `📊 *التقرير اليومي — Ashal Empire*\n\n` +
     `📦 دورة الطلبات: COD✅${lifecycle.codFixed ?? 0} | منتهية🚫${lifecycle.pendingExpired ?? 0} | شحن🚚${lifecycle.toShipped ?? 0} | وصلت🏠${lifecycle.toDelivered ?? 0}\n` +
-    `🤖 Titan-5: ${titan5.productsUpserted ?? 0} منتج محدّث\n` +
+    `🤖 TITAN-10: ${((titan10.duration ?? 0) / 1000).toFixed(1)}s\n` +
     `🛒 عربات مهجورة: ${(cart.remindersSent ?? 0)} تذكير + ${(cart.discountsSent ?? 0)} خصم\n` +
     `⭐ طلبات تقييم: ${trust.requestsSent ?? 0} رسالة\n` +
     `💹 تعديلات السعر: ${empire.adjustments ?? 0} منتج\n` +
