@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { applyCoupon } from '@/lib/pricing-engine';
 import { rateLimit } from '@/lib/rate-limit';
+import { processOrderAutomation } from '@/lib/order-automation';
 
 export async function POST(req: NextRequest) {
   // Rate limiting
@@ -87,6 +88,18 @@ export async function POST(req: NextRequest) {
       }
     }).catch(() => {});
 
+    // COD: mark PAID immediately and trigger automation (no payment gateway needed)
+    if (body.paymentMethod === 'cod') {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { paymentStatus: 'PAID', updatedAt: new Date() }
+      });
+      // Fire automation async — don't block the response
+      processOrderAutomation(order.id).catch((e) =>
+        console.error(`[COD] Automation failed for ${order.id}:`, e)
+      );
+    }
+
     // Return order ID + Moyasar payload
     const moyasarPublishableKey = process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY ?? '';
     return NextResponse.json({
@@ -97,7 +110,9 @@ export async function POST(req: NextRequest) {
       moyasarKey: moyasarPublishableKey,
       // Amount in halalas (SAR × 100) for Moyasar API
       amountHalalas: Math.round(totalAmount * 100),
-      message:    'تم إنشاء الطلب بنجاح — المرحلة التالية: الدفع عبر Moyasar',
+      message:    body.paymentMethod === 'cod'
+        ? 'تم تأكيد الطلب — سيتواصل معك المندوب قريباً'
+        : 'تم إنشاء الطلب بنجاح — المرحلة التالية: الدفع عبر Moyasar',
     });
 
   } catch (error) {

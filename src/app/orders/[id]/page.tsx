@@ -23,6 +23,14 @@ const STATUS_COLOR: Record<string, string> = {
   FULFILLING: '#8B5CF6', SHIPPED: '#10B981', DELIVERED: '#16A34A', FAILED: '#DC2626',
 };
 
+// Normalize PENDING_COD / PENDING_TABBY / PENDING_TAMARA → PENDING for display
+function normalizeStatus(status: string): string {
+  if (status.startsWith('PENDING_')) return 'PENDING';
+  return status;
+}
+
+const SUPPORT_WHATSAPP = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? '966500000000';
+
 export default async function OrderTrackingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -34,7 +42,8 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
   });
   if (!order) notFound();
 
-  const currentStepIdx = STATUS_STEPS.findIndex(s => s.key === order.paymentStatus);
+  const displayStatus = normalizeStatus(order.paymentStatus);
+  const currentStepIdx = STATUS_STEPS.findIndex(s => s.key === displayStatus);
   const isFailed = order.paymentStatus === 'FAILED';
 
   const product = order.product as unknown as { titleAr: string; titleEn: string; finalPrice: number; imageUrl?: string; supplier?: string };
@@ -99,11 +108,11 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
             <span style={{
               padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,
               fontFamily: 'var(--font-montserrat)',
-              background: `${STATUS_COLOR[order.paymentStatus] ?? '#888'}22`,
-              color: STATUS_COLOR[order.paymentStatus] ?? '#888',
-              border: `1px solid ${STATUS_COLOR[order.paymentStatus] ?? '#888'}44`,
+              background: `${STATUS_COLOR[displayStatus] ?? '#888'}22`,
+              color: STATUS_COLOR[displayStatus] ?? '#888',
+              border: `1px solid ${STATUS_COLOR[displayStatus] ?? '#888'}44`,
             }}>
-              {order.paymentStatus}
+              {displayStatus}
             </span>
           </div>
         </div>
@@ -209,7 +218,7 @@ export default async function OrderTrackingPage({ params }: { params: Promise<{ 
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
-              href="https://wa.me/966500000000"
+              href={`https://wa.me/${SUPPORT_WHATSAPP}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
