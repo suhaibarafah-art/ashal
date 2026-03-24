@@ -104,35 +104,26 @@ async function searchCJ(keywords: string[], minCost: number): Promise<ScoutProdu
         results.push(...simulateCJ(keyword));
         continue;
       }
-      const list = data?.data?.list ?? [];
+      const list = data?.data?.list ?? data?.result?.list ?? [];
       for (const p of list) {
-        const rawPrice = typeof p.sellPrice === 'string' ? parseFloat(p.sellPrice) : p.sellPrice;
-        const cost = p.sourcePrice ?? rawPrice * 0.5;
-        if (cost < minCost) continue;
-        const inStock = await checkCJStock(p.pid, token);
-        if (!inStock) continue;
+        const sellPrice = typeof p.sellPrice === 'string' ? parseFloat(p.sellPrice) : (p.sellPrice ?? 0);
+        const srcPrice = typeof p.sourcePrice === 'string' ? parseFloat(p.sourcePrice) : (p.sourcePrice ?? 0);
+        const cost = srcPrice > 0 ? srcPrice : sellPrice * 0.5;
+        if (!cost || cost < minCost) continue;
+        const img = p.productImage ?? '';
+        const title = p.productNameEn ?? p.productName ?? '';
+        if (!img || !title) continue;
         results.push(buildProduct(
-          `CJ-${p.pid}`, p.productNameEn ?? p.productName, p.productImage,
+          `CJ-${p.pid}`, title, img,
           cost, p.categoryName ?? keyword, keyword, 'CJ'
         ));
       }
     } catch {
       await logAgent('SCOUT', `CJ خطأ: ${keyword}`, 'ERROR');
+      results.push(...simulateCJ(keyword));
     }
   }
   return results;
-}
-
-async function checkCJStock(pid: string, token: string): Promise<boolean> {
-  try {
-    const res = await fetch(
-      `https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`,
-      { headers: { 'CJ-Access-Token': token }, signal: AbortSignal.timeout(4000) }
-    );
-    const data = await res.json();
-    const status: string = data?.data?.productStatus ?? data?.result?.productStatus ?? 'AVAILABLE';
-    return status !== 'STOP_SALE' && status !== 'OFFLINE';
-  } catch { return true; }
 }
 
 // ─── SUPPLIER 2: ALIEXPRESS ────────────────────────────────────────────────
