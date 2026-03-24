@@ -100,47 +100,6 @@ export async function processOrderAutomation(orderId: string) {
   }
 }
 
-// ─── CJ Dropshipping Supplier Submission ────────────────────────────────────
-async function submitToSupplier(productName: string, city: string) {
-  const CJ_KEY = process.env.CJ_API_KEY;
-
-  if (CJ_KEY && !CJ_KEY.startsWith('your_')) {
-    try {
-      const res = await fetch('https://developers.cjdropshipping.com/api2.0/v1/order/createOrder', {
-        method: 'POST',
-        headers: {
-          'CJ-Access-Token': CJ_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderNumber: `SL-${Date.now()}`,
-          shippingCountry: 'SA',
-          shippingCity: city,
-          products: [{ displayName: productName, quantity: 1 }],
-        }),
-      });
-      const data = await res.json();
-      if (data?.result?.orderId) {
-        return {
-          status: 'SUCCESS',
-          supplierOrderId: data.result.orderId,
-          tracking: data.result.trackingNumber ?? `KSA-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        };
-      }
-    } catch {
-      // Fall through to simulation
-    }
-  }
-
-  // Simulation fallback
-  await new Promise(r => setTimeout(r, 800));
-  return {
-    status: 'SUCCESS',
-    supplierOrderId: `SUP-${Math.floor(Math.random() * 100000)}`,
-    tracking: `KSA-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-  };
-}
-
 // ─── WhatsApp Business Cloud API ────────────────────────────────────────────
 async function sendWhatsAppNotification(
   phone: string,
@@ -180,21 +139,3 @@ async function sendWhatsAppNotification(
   }).then(r => r.json()).then(d => console.log('[WhatsApp]', d)).catch(console.error);
 }
 
-// ─── Telegram Alert to CEO ───────────────────────────────────────────────────
-async function sendTelegramAlert(orderId: string, productTitle: string, amount: number) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!token || !chatId || token === 'placeholder') {
-    console.log(`[Telegram] No token — would alert CEO about order ${orderId}`);
-    return;
-  }
-
-  const text = `🚀 *طلب جديد — SAUDILUX*\n\n🆔 \`${orderId.slice(-8).toUpperCase()}\`\n🛍️ ${productTitle}\n💰 *${amount.toFixed(2)} SAR*\n\n_تحقق من لوحة التحكم_`;
-
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' }),
-  }).catch(console.error);
-}

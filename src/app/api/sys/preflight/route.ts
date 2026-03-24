@@ -1,48 +1,61 @@
 /**
- * Saudi Luxury Store - Pre-Flight Autopilot
- * نظام الفحص النهائي - التاكد من سلامة الربط قبل البيع الحقيقي.
+ * Saudi Luxury Store - Pre-Flight Check
+ * Admin-only endpoint — requires x-admin-key: CRON_SECRET
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { cjEngine } from '@/lib/cj-supplier';
-import { moyasarCore } from '@/lib/moyasar-real';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Auth guard — only admin can trigger live API checks
+  const secret = process.env.CRON_SECRET;
+  if (secret) {
+    const key = req.headers.get('x-admin-key') ?? '';
+    const auth = req.headers.get('authorization') ?? '';
+    if (key !== secret && auth !== `Bearer ${secret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
   try {
-    console.log("🚀 Pre-Flight Check: Initiating System Pulse...");
-
     const results = {
-      supplierActive: false,
-      paymentActive: false,
-      databaseActive: true,
-      errors: [] as string[]
+      database: true,
+      supplier: { connected: false, optional: true, note: '' },
+      payment: { configured: false, note: '' },
+      notifications: {
+        whatsapp: !!process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_TOKEN !== 'placeholder',
+        telegram: !!process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_BOT_TOKEN !== 'placeholder',
+      },
+      errors: [] as string[],
     };
 
-    // 1. Test Supplier Connection
+    // 1. CJ Dropshipping (optional — falls back to simulation)
     try {
-      const prods = await cjEngine.searchProducts("Vase");
-      results.supplierActive = prods.length > 0;
-    } catch (e: any) {
-      results.errors.push(`Supplier: ${e.message}`);
+      const prods = await cjEngine.searchProducts('watch');
+      results.supplier.connected = prods.length > 0;
+      results.supplier.note = prods.length > 0 ? 'Live API connected' : 'No results — simulation fallback active';
+    } catch (e: unknown) {
+      results.supplier.note = 'Simulation fallback active';
+      results.errors.push(`Supplier (non-critical): ${String(e)}`);
     }
 
-    // 2. Test Payment Core
-    try {
-      const inv = await moyasarCore.createInvoice({ amount: 100, currency: "SAR", description: "Test" });
-      results.paymentActive = !!inv.id;
-    } catch (e: any) {
-      results.errors.push(`Payment: ${e.message}`);
+    // 2. Moyasar (required for payments)
+    const moyasarKey = process.env.MOYASAR_SECRET_KEY ?? '';
+    results.payment.configured = !!moyasarKey && moyasarKey !== 'PENDING' && !moyasarKey.startsWith('sk_test_MISSING');
+    results.payment.note = results.payment.configured ? 'Live key present' : 'Key missing or placeholder';
+    if (!results.payment.configured) {
+      results.errors.push('Payment: MOYASAR_SECRET_KEY not configured');
     }
 
-    const isReady = results.supplierActive && results.paymentActive;
+    const isReady = results.payment.configured; // supplier is optional
 
     return NextResponse.json({
-      status: isReady ? "SYSTEM_READY" : "INTEGRATION_PENDING",
+      status: isReady ? 'READY' : 'CONFIG_NEEDED',
       checks: results,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
   } catch (error) {
-    return NextResponse.json({ status: "FAIL", error }, { status: 500 });
+    return NextResponse.json({ status: 'FAIL', error: String(error) }, { status: 500 });
   }
 }
