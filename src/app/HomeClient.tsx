@@ -66,7 +66,7 @@ export default function HomeClient({ products }: HomeClientProps) {
     <main style={{ background: 'var(--bg-primary)' }}>
 
       {/* ═══ HERO ═══ */}
-      <section ref={heroRef} className="relative w-full overflow-hidden" style={{ minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <section ref={heroRef} className="relative w-full overflow-hidden" style={{ minHeight: '85vh', marginTop: '-108px', paddingTop: '108px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div className="absolute inset-0 z-0" style={{ y: yBg }}>
           <div
             className="absolute inset-0 scale-110 bg-cover bg-center"
