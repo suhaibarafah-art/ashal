@@ -214,10 +214,13 @@ export class EmpireSeeder {
   static async seedEmpireCatalog(): Promise<number> {
     console.log("🏛️ EmpireSeeder: seeding luxury catalog...");
 
-    // Delete old products with wrong/random images before re-seeding
-    await prisma.product.deleteMany({});
-    console.log("🗑️ Cleared old products");
+    // 1. Delete products that have NO orders (safe — no FK constraint)
+    await prisma.product.deleteMany({
+      where: { orders: { none: {} } },
+    });
+    console.log("🗑️ Deleted orphan products (no orders)");
 
+    // 2. Upsert the 20 luxury products (create or update by titleEn)
     let count = 0;
     for (const p of LUXURY_CATALOG) {
       const finalPrice = calculateDynamicPrice(p.cost, p.shipping, {
@@ -226,8 +229,18 @@ export class EmpireSeeder {
         recentSalesCount: 30,
       });
 
-      await prisma.product.create({
-        data: {
+      await prisma.product.upsert({
+        where: { titleEn: p.en },
+        update: {
+          titleAr: p.ar,
+          descAr: `${p.desc}\n\nالمواد: ${p.materials}. العناية: ${p.care}`,
+          imageUrl: p.img,
+          finalPrice,
+          supplier: p.supplier,
+          category: p.category,
+          stockLevel: 50,
+        },
+        create: {
           titleEn: p.en,
           titleAr: p.ar,
           descAr: `${p.desc}\n\nالمواد: ${p.materials}. العناية: ${p.care}`,
@@ -243,6 +256,12 @@ export class EmpireSeeder {
       });
       count++;
     }
+
+    // 3. Fix any remaining old products (those with orders) — replace picsum with luxury image
+    await prisma.product.updateMany({
+      where: { imageUrl: { contains: 'picsum' } },
+      data: { imageUrl: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=85' },
+    });
 
     console.log(`✅ EmpireSeeder: ${count} luxury products seeded.`);
     return count;
