@@ -44,8 +44,23 @@ async function getCJToken(): Promise<string> {
   try {
     const row = await prisma.siteSetting.findUnique({ where: { key: 'cj_access_token' } });
     if (row) {
-      const { token, expiresAt } = JSON.parse(row.value);
-      if (new Date(expiresAt) > new Date()) return token;
+      // Try JSON format first: { token, expiresAt }
+      try {
+        const parsed = JSON.parse(row.value) as { token?: string; expiresAt?: string };
+        if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) {
+          return parsed.token;
+        }
+      } catch {
+        // Raw string format — check expiry from separate key
+        const expiryRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
+        if (expiryRow && new Date(expiryRow.value) > new Date()) {
+          return row.value; // raw token
+        }
+        // No expiry stored — assume valid if token exists
+        if (!expiryRow && row.value && row.value.length > 10) {
+          return row.value;
+        }
+      }
     }
   } catch { /* fall through */ }
   return process.env.CJ_ACCESS_TOKEN ?? '';
@@ -88,6 +103,8 @@ function buildProduct(
 async function searchCJ(keywords: string[], minCost: number): Promise<ScoutProduct[]> {
   const token = await getCJToken();
   const results: ScoutProduct[] = [];
+  const mode = (!token || token.startsWith('your_')) ? 'SIMULATION' : 'LIVE';
+  await logAgent('SCOUT', `CJ وضع: ${mode} | طول التوكن: ${token?.length ?? 0}`, 'INFO');
 
   for (const keyword of keywords.slice(0, 5)) {
     try {
@@ -101,10 +118,12 @@ async function searchCJ(keywords: string[], minCost: number): Promise<ScoutProdu
       );
       const data = await res.json();
       if (res.status === 401 || data?.code === 1600001) {
+        await logAgent('SCOUT', `CJ رفض التوكن (${res.status}) — fallback simulation`, 'WARN');
         results.push(...simulateCJ(keyword));
         continue;
       }
       const list = data?.data?.list ?? data?.result?.list ?? [];
+      await logAgent('SCOUT', `CJ كلمة "${keyword}": ${list.length} نتيجة (code=${data?.code})`, 'INFO');
       for (const p of list) {
         const sellPrice = typeof p.sellPrice === 'string' ? parseFloat(p.sellPrice) : (p.sellPrice ?? 0);
         const srcPrice = typeof p.sourcePrice === 'string' ? parseFloat(p.sourcePrice) : (p.sourcePrice ?? 0);
