@@ -233,6 +233,7 @@ export async function GET(req: import('next/server').NextRequest) {
   const results: Record<string, unknown> = {};
   const hourUTC = new Date().getUTCHours();
   const isMorning = hourUTC === 6; // 06:00 UTC = 09:00 KSA
+  const buildTag = 'v2-surveillance'; // build marker — remove after confirming deploy
 
   if (isMorning) {
     // ═══════════════════════════════════════════════════════
@@ -305,7 +306,7 @@ export async function GET(req: import('next/server').NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, mode: 'FULL_PIPELINE', hourUTC, totalMs, results });
+    return NextResponse.json({ success: true, mode: 'FULL_PIPELINE', hourUTC, buildTag, totalMs, results });
 
   } else {
     // ═══════════════════════════════════════════════════════
@@ -331,6 +332,6 @@ export async function GET(req: import('next/server').NextRequest) {
     }
 
     const totalMs = Date.now() - masterStart;
-    return NextResponse.json({ success: true, mode: 'SURVEILLANCE', hourUTC, totalMs, results });
+    return NextResponse.json({ success: true, mode: 'SURVEILLANCE', hourUTC, buildTag, totalMs, results });
   }
 }
