@@ -2,7 +2,6 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductActions } from './ProductActions';
-import { ProductImage } from './ProductImage';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
@@ -70,16 +69,32 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{product.titleAr}</span>
         </nav>
 
-        {/* Main 2-col grid — dir=ltr forces Image LEFT, Info RIGHT on all locales */}
-        <div dir="ltr" className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        {/* Main 2-col grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
-          {/* ── Image ── LEFT column */}
+          {/* ── Image ── */}
           <div>
-            <ProductImage src={imageUrl} alt={product.titleAr} soldCount={soldCount} />
+            <div
+              className="w-full rounded-xl overflow-hidden"
+              style={{ aspectRatio: '1/1', background: 'var(--bg-tertiary)', boxShadow: 'var(--shadow-card)', position: 'relative' }}
+            >
+              <img
+                src={imageUrl}
+                alt={product.titleAr}
+                className="w-full h-full object-cover"
+                loading="eager"
+              />
+              {/* Sold badge */}
+              <div style={{ position: 'absolute', top: '14px', right: '14px', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '4px 12px' }}>
+                <span style={{ color: 'white', fontFamily: 'var(--font-cairo)', fontSize: '12px', fontWeight: 700 }}>
+                  🔥 {soldCount}+ مبيعة
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* ── Product Info ── RIGHT column, text stays RTL */}
-          <div dir="rtl" className="flex flex-col gap-5">
+          {/* ── Product Info ── */}
+          <div className="flex flex-col gap-5">
 
             {/* Shipping + stock tags */}
             <div className="flex items-center gap-3 flex-wrap">
@@ -136,7 +151,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
             {/* Price */}
             <div className="flex items-baseline gap-3">
-              <span className="price-tag-lg">SAR {product.finalPrice.toLocaleString('ar-SA')}</span>
+              <span className="price-tag-lg">SAR {product.finalPrice.toLocaleString('en-US')}</span>
               <span
                 className="text-[12px] font-semibold px-2 py-1 rounded"
                 style={{ background: 'var(--color-orange-ghost)', color: 'var(--color-orange)', fontFamily: 'var(--font-cairo)' }}

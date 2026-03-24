@@ -66,7 +66,7 @@ export default function HomeClient({ products }: HomeClientProps) {
     <main style={{ background: 'var(--bg-primary)' }}>
 
       {/* ═══ HERO ═══ */}
-      <section ref={heroRef} className="relative w-full overflow-hidden" style={{ minHeight: '85vh', marginTop: '-108px', paddingTop: '108px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <section ref={heroRef} className="relative w-full overflow-hidden" style={{ minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div className="absolute inset-0 z-0" style={{ y: yBg }}>
           <div
             className="absolute inset-0 scale-110 bg-cover bg-center"
@@ -103,7 +103,7 @@ export default function HomeClient({ products }: HomeClientProps) {
             <a href="#collection">
               <button className="btn-primary text-[16px] px-8 py-4">
                 تسوق الآن
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: 'scaleX(-1)' }}><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
             </a>
             <Link href="/admin">
@@ -187,7 +187,7 @@ export default function HomeClient({ products }: HomeClientProps) {
                         )}
                       </div>
                       <button
-                        className="absolute top-3 end-3 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md"
+                        className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md"
                         onClick={(e) => e.preventDefault()}
                         style={{ color: '#FF8C00' }}
                       >
@@ -204,11 +204,8 @@ export default function HomeClient({ products }: HomeClientProps) {
                         {product.descAr}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="price-tag">SAR {product.finalPrice.toLocaleString('ar-SA')}</span>
-                        <span className="text-[11px] font-bold flex items-center gap-1" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-cairo)' }}>
-                          تفاصيل
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: 'scaleX(-1)' }}><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </span>
+                        <span className="price-tag">SAR {product.finalPrice.toLocaleString('en-US')}</span>
+                        <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-montserrat)' }}>تفاصيل ←</span>
                       </div>
                     </div>
                   </div>

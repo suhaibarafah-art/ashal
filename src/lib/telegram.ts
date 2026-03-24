@@ -23,7 +23,7 @@ export async function sendTelegramAlert(type: AlertType, message: string): Promi
   }
 
   const icon = ALERT_ICONS[type];
-  const text = `${icon} *[${type}] Ashal Empire*\n\n${message}\n\n_${new Date().toLocaleString('ar-SA')}_`;
+  const text = `${icon} *[${type}] Ashal Empire*\n\n${message}\n\n_${new Date().toLocaleString('en-US')}_`;
 
   try {
     const res = await fetch(

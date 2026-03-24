@@ -57,7 +57,7 @@ export default async function WarRoomPage() {
     const log = agentLogs.find(l => l.source === `agent/${name.toLowerCase()}`);
     return {
       name,
-      lastRun: log ? new Date(log.createdAt).toLocaleString('ar-SA') : 'لم يعمل بعد',
+      lastRun: log ? new Date(log.createdAt).toLocaleString('en-US') : 'لم يعمل بعد',
       status: log ? (log.level === 'SUCCESS' || log.level === 'INFO' ? 'OK' : 'WARN') : 'IDLE',
       message: log?.message ?? '—',
     };

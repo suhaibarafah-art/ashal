@@ -184,7 +184,7 @@ export default async function CompleteTheLook({ excludeProductId }: Props) {
                   className="text-[18px] font-black"
                   style={{ color: '#C9A84C', fontFamily: 'var(--font-cairo)' }}
                 >
-                  SAR {item.price.toLocaleString('ar-SA')}
+                  SAR {item.price.toLocaleString('en-US')}
                 </span>
                 {item.id ? (
                   <Link href={`/products/${item.id}`}>
