@@ -1,13 +1,14 @@
 /**
- * Master Daily Cron — GET /api/cron/master
- * Called by Vercel cron (Hobby plan: 1 slot only) at 06:00 UTC daily.
+ * Master Cron — GET /api/cron/master
+ * Called by Vercel cron every 4 hours: 0 *\/4 * * *  (Hobby plan: 1 slot)
  *
- * Sequence:
- *  1. Titan-5 agents  (Scout → Copywriter → Critic → Strategist → CEO)
- *  2. Abandoned cart recovery  (4h reminder + 24h discount)
- *  3. Trust builder            (review request 5 days post-order)
- *  4. Empire engine            (safe dynamic pricing — never below 20% margin)
- *  5. Telegram daily summary   (CEO morning briefing)
+ * Hour-based mode (UTC):
+ *  06:00 → FULL_PIPELINE
+ *          Scout → Critic → Copywriter → Strategist → CEO → Analyst
+ *          + Cart Recovery + Trust Builder + Empire Engine + Telegram briefing
+ *
+ *  00:00, 04:00, 08:00, 12:00, 16:00, 20:00 → SURVEILLANCE
+ *          Guardian (stock sync) + OrdersSync (tracking) + Recovery (carts)
  */
 
 import { NextResponse } from 'next/server';
@@ -230,72 +231,106 @@ export async function GET(req: import('next/server').NextRequest) {
 
   const masterStart = Date.now();
   const results: Record<string, unknown> = {};
+  const hourUTC = new Date().getUTCHours();
+  const isMorning = hourUTC === 6; // 06:00 UTC = 09:00 KSA
 
-  // 0. Order lifecycle automation (runs first — fixes stuck orders)
-  try {
-    results.orderLifecycle = await runOrderLifecycle();
-  } catch (e) {
-    results.orderLifecycle = { success: false, error: String(e) };
+  if (isMorning) {
+    // ═══════════════════════════════════════════════════════
+    // FULL_PIPELINE — runs once daily at 06:00 UTC
+    // ═══════════════════════════════════════════════════════
+
+    // 0. Order lifecycle automation (fixes stuck orders)
+    try {
+      results.orderLifecycle = await runOrderLifecycle();
+    } catch (e) {
+      results.orderLifecycle = { success: false, error: String(e) };
+    }
+
+    // 1. TITAN-10 full pipeline
+    try {
+      const report = await runTitan10('FULL_PIPELINE');
+      results.titan10 = { success: true, duration: report.duration, pipeline: report.pipeline };
+      await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/master', message: `TITAN-10 FULL_PIPELINE complete in ${(report.duration / 1000).toFixed(1)}s` } });
+    } catch (e) {
+      results.titan10 = { success: false, error: String(e) };
+      await alertCritical('cron/master → titan10', String(e));
+    }
+
+    // 2. Abandoned cart recovery
+    try {
+      results.cartRecovery = await runAbandonedCartRecovery();
+    } catch (e) {
+      results.cartRecovery = { success: false, error: String(e) };
+    }
+
+    // 3. Trust builder
+    try {
+      results.trustBuilder = await runTrustBuilder();
+    } catch (e) {
+      results.trustBuilder = { success: false, error: String(e) };
+    }
+
+    // 4. Empire engine (pricing)
+    try {
+      results.empireEngine = await runEmpireEngine();
+    } catch (e) {
+      results.empireEngine = { success: false, error: String(e) };
+    }
+
+    const totalMs = Date.now() - masterStart;
+
+    // 5. Daily Telegram briefing
+    const titan10   = results.titan10 as { duration?: number };
+    const cart      = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
+    const trust     = results.trustBuilder as { requestsSent?: number };
+    const empire    = results.empireEngine as { adjustments?: number };
+    const lifecycle = results.orderLifecycle as { codFixed?: number; pendingExpired?: number; toShipped?: number; toDelivered?: number };
+
+    await sendTelegramAlert('SUCCESS',
+      `📊 *التقرير اليومي — Ashal Empire*\n\n` +
+      `📦 دورة الطلبات: COD✅${lifecycle.codFixed ?? 0} | منتهية🚫${lifecycle.pendingExpired ?? 0} | شحن🚚${lifecycle.toShipped ?? 0} | وصلت🏠${lifecycle.toDelivered ?? 0}\n` +
+      `🤖 TITAN-10: ${((titan10.duration ?? 0) / 1000).toFixed(1)}s\n` +
+      `🛒 عربات مهجورة: ${(cart.remindersSent ?? 0)} تذكير + ${(cart.discountsSent ?? 0)} خصم\n` +
+      `⭐ طلبات تقييم: ${trust.requestsSent ?? 0} رسالة\n` +
+      `💹 تعديلات السعر: ${empire.adjustments ?? 0} منتج\n` +
+      `⏱️ المدة الكلية: ${(totalMs / 1000).toFixed(1)}s`
+    ).catch(() => {});
+
+    await prisma.systemLog.create({
+      data: {
+        level: 'SUCCESS',
+        source: 'cron/master',
+        message: `Master FULL_PIPELINE complete in ${totalMs}ms`,
+        metadata: JSON.stringify(results),
+      },
+    });
+
+    return NextResponse.json({ success: true, mode: 'FULL_PIPELINE', hourUTC, totalMs, results });
+
+  } else {
+    // ═══════════════════════════════════════════════════════
+    // SURVEILLANCE — runs at 00, 04, 08, 12, 16, 20 UTC
+    // Guardian: sync stock levels from CJ
+    // OrdersSync: update tracking numbers for FULFILLING orders
+    // Recovery: send abandoned cart reminders
+    // ═══════════════════════════════════════════════════════
+    try {
+      const report = await runTitan10('SURVEILLANCE');
+      results.surveillance = { success: true, duration: report.duration, ...report.surveillance };
+      await prisma.systemLog.create({
+        data: {
+          level: 'INFO',
+          source: 'cron/master',
+          message: `SURVEILLANCE complete in ${(report.duration / 1000).toFixed(1)}s | hour: ${hourUTC}:00 UTC`,
+          metadata: JSON.stringify(report.surveillance),
+        },
+      });
+    } catch (e) {
+      results.surveillance = { success: false, error: String(e) };
+      await alertCritical('cron/master → surveillance', String(e));
+    }
+
+    const totalMs = Date.now() - masterStart;
+    return NextResponse.json({ success: true, mode: 'SURVEILLANCE', hourUTC, totalMs, results });
   }
-
-  // 1. Titan-10
-  try {
-    const report = await runTitan10('FULL_PIPELINE');
-    results.titan10 = { success: true, duration: report.duration, pipeline: report.pipeline };
-    await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/master', message: `TITAN-10 complete in ${(report.duration / 1000).toFixed(1)}s` } });
-  } catch (e) {
-    results.titan10 = { success: false, error: String(e) };
-    await alertCritical('cron/master → titan10', String(e));
-  }
-
-  // 2. Abandoned cart recovery
-  try {
-    results.cartRecovery = await runAbandonedCartRecovery();
-  } catch (e) {
-    results.cartRecovery = { success: false, error: String(e) };
-  }
-
-  // 3. Trust builder
-  try {
-    results.trustBuilder = await runTrustBuilder();
-  } catch (e) {
-    results.trustBuilder = { success: false, error: String(e) };
-  }
-
-  // 4. Empire engine
-  try {
-    results.empireEngine = await runEmpireEngine();
-  } catch (e) {
-    results.empireEngine = { success: false, error: String(e) };
-  }
-
-  const totalMs = Date.now() - masterStart;
-
-  // 5. Daily Telegram briefing to CEO
-  const titan10   = results.titan10 as { duration?: number };
-  const cart      = results.cartRecovery as { remindersSent?: number; discountsSent?: number };
-  const trust     = results.trustBuilder as { requestsSent?: number };
-  const empire    = results.empireEngine as { adjustments?: number; whiteLabelAlerts?: number };
-  const lifecycle = results.orderLifecycle as { codFixed?: number; pendingExpired?: number; toFulfilling?: number; toShipped?: number; toDelivered?: number };
-
-  await sendTelegramAlert('SUCCESS',
-    `📊 *التقرير اليومي — Ashal Empire*\n\n` +
-    `📦 دورة الطلبات: COD✅${lifecycle.codFixed ?? 0} | منتهية🚫${lifecycle.pendingExpired ?? 0} | شحن🚚${lifecycle.toShipped ?? 0} | وصلت🏠${lifecycle.toDelivered ?? 0}\n` +
-    `🤖 TITAN-10: ${((titan10.duration ?? 0) / 1000).toFixed(1)}s\n` +
-    `🛒 عربات مهجورة: ${(cart.remindersSent ?? 0)} تذكير + ${(cart.discountsSent ?? 0)} خصم\n` +
-    `⭐ طلبات تقييم: ${trust.requestsSent ?? 0} رسالة\n` +
-    `💹 تعديلات السعر: ${empire.adjustments ?? 0} منتج\n` +
-    `⏱️ المدة الكلية: ${(totalMs / 1000).toFixed(1)}s`
-  ).catch(() => {});
-
-  await prisma.systemLog.create({
-    data: {
-      level: 'SUCCESS',
-      source: 'cron/master',
-      message: `Master cron complete in ${totalMs}ms`,
-      metadata: JSON.stringify(results),
-    },
-  });
-
-  return NextResponse.json({ success: true, totalMs, results });
 }
