@@ -67,7 +67,14 @@ async function getCJToken(): Promise<string | null> {
       _tokenExpiry = data.result.accessTokenExpiryDate
         ? new Date(data.result.accessTokenExpiryDate).getTime() - 3_600_000
         : Date.now() + 22 * 3_600_000;
-      console.log('[CJ] Token obtained via re-auth');
+      // Save to DB so Scout agent and other services can use it
+      const expiresAt = new Date(_tokenExpiry).toISOString();
+      await prisma.siteSetting.upsert({
+        where:  { key: 'cj_access_token' },
+        update: { value: JSON.stringify({ token: _cachedToken, expiresAt }) },
+        create: { key: 'cj_access_token', value: JSON.stringify({ token: _cachedToken, expiresAt }) },
+      }).catch(() => {}); // non-blocking
+      console.log('[CJ] Token obtained + saved to DB');
       return _cachedToken;
     }
   } catch (e) {
