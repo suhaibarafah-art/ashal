@@ -76,17 +76,37 @@ async function getCJToken(): Promise<string | null> {
   return null;
 }
 
+// ─── VID LOOKUP ─────────────────────────────────────────────────────────────
+// Fetches the first variant ID for a CJ product (needed for order submission)
+async function fetchCJVid(token: string, pid: string): Promise<string> {
+  try {
+    const res = await fetch(
+      `${CJ_BASE}/product/variant/query?pid=${encodeURIComponent(pid)}`,
+      { headers: { 'CJ-Access-Token': token }, signal: AbortSignal.timeout(8000) }
+    );
+    const data = await res.json() as { code?: number; data?: Array<{ vid?: string }> };
+    if (data.code === 200 && data.data?.[0]?.vid) return data.data[0].vid;
+  } catch { /* fall through */ }
+  return '';
+}
+
 export async function cjCreateOrder(params: {
   orderNumber: string;
   shippingCountry: string;
   shippingCity: string;
   productName: string;
   quantity?: number;
+  // Customer details (required by CJ)
+  customerName?: string;
+  customerPhone?: string;
+  shippingAddress?: string;
+  shippingZip?: string;
+  // CJ product identifiers
+  supplierSku?: string; // "CJ-{pid}" or "{pid}:{vid}"
 }): Promise<{ success: boolean; cjOrderId?: string; trackingNumber?: string; error?: string }> {
   const token = await getCJToken();
 
   if (!token) {
-    // Simulation fallback
     console.log('[CJ] No token — simulation fallback');
     return {
       success: true,
@@ -95,38 +115,68 @@ export async function cjCreateOrder(params: {
     };
   }
 
+  // ─── Resolve VID ────────────────────────────────────────────────────────
+  let vid = '';
+  if (params.supplierSku) {
+    const sku = params.supplierSku.replace(/^CJ-/, ''); // strip "CJ-" prefix
+    if (sku.includes(':')) {
+      // "pid:vid" format — use VID directly
+      vid = sku.split(':')[1];
+    } else {
+      // Only PID — fetch VID from CJ API
+      vid = await fetchCJVid(token, sku);
+      console.log(`[CJ] Fetched VID for ${sku}: ${vid || 'not found'}`);
+    }
+  }
+
   try {
+    const productEntry = vid
+      ? { vid, quantity: params.quantity ?? 1 }
+      : { displayName: params.productName, quantity: params.quantity ?? 1 };
+
+    const body = {
+      orderNumber:          params.orderNumber,
+      fromCountryCode:      'CN',
+      shippingCountry:      params.shippingCountry,
+      shippingCity:         params.shippingCity,
+      shippingAddress:      params.shippingAddress ?? params.shippingCity,
+      shippingZip:          params.shippingZip ?? '',
+      shippingPhone:        (params.customerPhone ?? '').replace(/\D/g, ''),
+      shippingCustomerName: params.customerName ?? 'Customer',
+      products:             [productEntry],
+    };
+
     const res = await fetch(`${CJ_BASE}/shopping/order/createOrder`, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'CJ-Access-Token': token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        orderNumber: params.orderNumber,
-        shippingCountry: params.shippingCountry,
-        shippingCity: params.shippingCity,
-        shippingAddress: params.shippingCity,
-        products: [{ displayName: params.productName, quantity: params.quantity ?? 1 }],
-      }),
+      body:    JSON.stringify(body),
     });
 
-    const data = await res.json() as { code?: number; result?: { orderId?: string; trackingNumber?: string }; message?: string };
+    const data = await res.json() as {
+      code?: number;
+      data?: { orderId?: string; orderNum?: string };
+      result?: { orderId?: string; trackingNumber?: string };
+      message?: string;
+    };
 
-    if (data.code === 200 && data.result?.orderId) {
+    if ((data.code === 200) && (data.data?.orderId ?? data.result?.orderId)) {
+      const cjOrderId = data.data?.orderId ?? data.result?.orderId ?? '';
+      console.log(`[CJ] ✅ Real order created: ${cjOrderId}`);
       return {
         success: true,
-        cjOrderId: data.result.orderId,
-        trackingNumber: data.result.trackingNumber ?? `KSA-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+        cjOrderId,
+        trackingNumber: data.result?.trackingNumber ?? `PENDING-${cjOrderId}`,
       };
     }
 
-    // API returned an error — simulation fallback so order still completes
-    console.warn('[CJ] Order API error:', data.message ?? data.code);
+    console.warn('[CJ] Order error:', data.message ?? data.code, '— simulation fallback');
     return {
-      success: true, // treat as success with simulated tracking
+      success: true,
       cjOrderId: `SIM-${Date.now()}`,
       trackingNumber: `KSA-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
     };
   } catch (e) {
-    console.error('[CJ] createOrder network error:', e);
+    console.error('[CJ] createOrder error:', e);
     return {
       success: true,
       cjOrderId: `SIM-ERR-${Date.now()}`,

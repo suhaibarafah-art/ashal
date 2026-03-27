@@ -132,8 +132,12 @@ async function searchCJ(keywords: string[], minCost: number): Promise<ScoutProdu
         const img = p.productImage ?? '';
         const title = p.productNameEn ?? p.productName ?? '';
         if (!img || !title) continue;
+        // Use pid:vid format so cjCreateOrder can submit real orders
+        const pid = p.pid ?? '';
+        const vid = p.variants?.[0]?.vid ?? p.vid ?? '';
+        const cjId = vid ? `CJ-${pid}:${vid}` : `CJ-${pid}`;
         results.push(buildProduct(
-          `CJ-${p.pid}`, title, img,
+          cjId, title, img,
           cost, p.categoryName ?? keyword, keyword, 'CJ'
         ));
       }

@@ -21,11 +21,15 @@ export async function processOrderAutomation(orderId: string) {
 
     // 1. Submit to Supplier (CJ Dropshipping — real OAuth token or simulation fallback)
     const supplierResponse = await cjCreateOrder({
-      orderNumber: `SL-${orderId.slice(-8).toUpperCase()}`,
+      orderNumber:     `SL-${orderId.slice(-8).toUpperCase()}`,
       shippingCountry: 'SA',
-      shippingCity: order.customerCity ?? 'Riyadh',
-      productName: order.product.titleEn,
-      quantity: 1,
+      shippingCity:    order.customerCity    ?? 'Riyadh',
+      shippingAddress: order.customerAddress ?? order.customerCity ?? 'Riyadh',
+      productName:     order.product.titleEn,
+      quantity:        1,
+      customerName:    order.customerName    ?? 'Customer',
+      customerPhone:   order.customerPhone   ?? '',
+      supplierSku:     order.product.supplierSku ?? '',
     });
 
     // 2. Initialize Logistic Bot
