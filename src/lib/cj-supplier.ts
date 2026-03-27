@@ -33,7 +33,7 @@ async function getDBToken(): Promise<string | null> {
   return null;
 }
 
-async function getCJToken(): Promise<string | null> {
+export async function getCJToken(): Promise<string | null> {
   // 1. In-memory cache
   if (_cachedToken && Date.now() < _tokenExpiry) return _cachedToken;
 
@@ -60,12 +60,20 @@ async function getCJToken(): Promise<string | null> {
     });
 
     if (!res.ok) throw new Error(`CJ auth HTTP ${res.status}`);
-    const data = await res.json() as { code?: number; result?: { accessToken?: string; accessTokenExpiryDate?: string } };
+    // CJ API v2 response: { code, result: true, data: { accessToken, accessTokenExpiryDate } }
+    const data = await res.json() as {
+      code?: number;
+      data?: { accessToken?: string; accessTokenExpiryDate?: string };
+      result?: { accessToken?: string; accessTokenExpiryDate?: string } | boolean;
+    };
+    // Support both response shapes
+    const tokenData = typeof data.result === 'object' ? data.result : data.data;
+    const accessToken = tokenData?.accessToken ?? '';
 
-    if (data.code === 200 && data.result?.accessToken) {
-      _cachedToken = data.result.accessToken;
-      _tokenExpiry = data.result.accessTokenExpiryDate
-        ? new Date(data.result.accessTokenExpiryDate).getTime() - 3_600_000
+    if (data.code === 200 && accessToken) {
+      _cachedToken = accessToken;
+      _tokenExpiry = tokenData?.accessTokenExpiryDate
+        ? new Date(tokenData.accessTokenExpiryDate).getTime() - 3_600_000
         : Date.now() + 22 * 3_600_000;
       // Save to DB so Scout agent and other services can use it
       const expiresAt = new Date(_tokenExpiry).toISOString();
@@ -74,7 +82,7 @@ async function getCJToken(): Promise<string | null> {
         update: { value: JSON.stringify({ token: _cachedToken, expiresAt }) },
         create: { key: 'cj_access_token', value: JSON.stringify({ token: _cachedToken, expiresAt }) },
       }).catch(() => {}); // non-blocking
-      console.log('[CJ] Token obtained + saved to DB');
+      console.log('[CJ] ✅ Token obtained + saved to DB');
       return _cachedToken;
     }
   } catch (e) {

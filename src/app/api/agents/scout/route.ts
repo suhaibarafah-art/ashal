@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAgentAuth, logAgent, setQueue, QUEUES, getConfig } from '@/lib/agent-runner';
 import { prisma } from '@/lib/prisma';
+import { getCJToken as getCJTokenFromSupplier } from '@/lib/cj-supplier';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -38,32 +39,11 @@ const SEARCH_KEYWORDS = [
 
 const SEASON_BOOST = ['gold', 'wedding', 'bridal', 'clutch', 'heels', 'evening', 'summer'];
 
-// ─── CJ TOKEN ──────────────────────────────────────────────────────────────
+// ─── CJ TOKEN — delegates to cj-supplier (auto-auth + DB cache) ─────────────
 
 async function getCJToken(): Promise<string> {
-  try {
-    const row = await prisma.siteSetting.findUnique({ where: { key: 'cj_access_token' } });
-    if (row) {
-      // Try JSON format first: { token, expiresAt }
-      try {
-        const parsed = JSON.parse(row.value) as { token?: string; expiresAt?: string };
-        if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) {
-          return parsed.token;
-        }
-      } catch {
-        // Raw string format — check expiry from separate key
-        const expiryRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
-        if (expiryRow && new Date(expiryRow.value) > new Date()) {
-          return row.value; // raw token
-        }
-        // No expiry stored — assume valid if token exists
-        if (!expiryRow && row.value && row.value.length > 10) {
-          return row.value;
-        }
-      }
-    }
-  } catch { /* fall through */ }
-  return process.env.CJ_ACCESS_TOKEN ?? '';
+  const token = await getCJTokenFromSupplier();
+  return token ?? '';
 }
 
 // ─── SCORING ───────────────────────────────────────────────────────────────
