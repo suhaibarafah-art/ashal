@@ -9,14 +9,20 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 async function getHealthData() {
-  const [dbCheck, recentLogs, orderStats] = await Promise.all([
+  const [dbCheck, recentLogs, orderStats, cjTokenRow, cjExpiryRow] = await Promise.all([
     prisma.$queryRaw`SELECT 1 as ok`.then(() => true).catch(() => false),
     prisma.systemLog.findMany({ orderBy: { createdAt: 'desc' }, take: 20 }),
     prisma.order.groupBy({ by: ['paymentStatus'], _count: { id: true } }),
+    prisma.siteSetting.findUnique({ where: { key: 'cj_access_token' } }).catch(() => null),
+    prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } }).catch(() => null),
   ]);
 
+  // CJ token: check DB first, then env var
+  const cjDbValid = !!(cjTokenRow?.value && cjTokenRow.value.length > 10 &&
+    (!cjExpiryRow || new Date(cjExpiryRow.value) > new Date()));
   const hasGemini   = !!(process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.startsWith('your_'));
-  const hasCJ       = !!(process.env.CJ_API_KEY && !process.env.CJ_API_KEY.startsWith('your_'));
+  const hasCJ       = cjDbValid || !!(process.env.CJ_API_KEY && !process.env.CJ_API_KEY.startsWith('your_'));
+  const cjExpiry    = cjExpiryRow?.value ?? null;
   const hasMoyasar  = !!(process.env.MOYASAR_API_KEY && process.env.MOYASAR_API_KEY.startsWith('sk_live'));
   const hasWhatsApp = !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_TOKEN !== 'placeholder');
   const hasTelegram = !!(process.env.TELEGRAM_BOT_TOKEN);
@@ -27,7 +33,7 @@ async function getHealthData() {
   const lastTitan = recentLogs.find(l => l.source.includes('titan'));
   const errors = recentLogs.filter(l => l.level === 'ERROR').slice(0, 5);
 
-  return { dbCheck, hasGemini, hasCJ, hasMoyasar, hasWhatsApp, hasTelegram, hasTabby, hasTamara, lastCron, lastTitan, errors, orderStats };
+  return { dbCheck, hasGemini, hasCJ, cjExpiry, cjDbValid, hasMoyasar, hasWhatsApp, hasTelegram, hasTabby, hasTamara, lastCron, lastTitan, errors, orderStats };
 }
 
 export default async function SystemHealthPage() {
@@ -36,7 +42,7 @@ export default async function SystemHealthPage() {
   const services = [
     { name: 'قاعدة البيانات', nameEn: 'Neon DB', ok: h.dbCheck, icon: '🗄️', detail: h.dbCheck ? 'متصل' : 'غير متصل' },
     { name: 'بوابة الدفع', nameEn: 'Moyasar', ok: h.hasMoyasar, icon: '💳', detail: h.hasMoyasar ? 'مفتاح حي' : 'مفتاح ناقص' },
-    { name: 'مورد CJ', nameEn: 'CJ Dropshipping', ok: h.hasCJ, icon: '📦', detail: h.hasCJ ? 'API key موجود' : 'مفتاح ناقص' },
+    { name: 'مورد CJ', nameEn: 'CJ Dropshipping', ok: h.hasCJ, icon: '📦', detail: h.hasCJ ? (h.cjDbValid ? `توكن في DB — ينتهي ${h.cjExpiry ? new Date(h.cjExpiry).toLocaleDateString('ar-SA') : '?'}` : 'CJ_API_KEY موجود') : 'لا يوجد توكن' },
     { name: 'Gemini AI', nameEn: 'Gemini AI', ok: h.hasGemini, icon: '🤖', detail: h.hasGemini ? 'مفتاح موجود' : 'مفتاح ناقص' },
     { name: 'واتساب', nameEn: 'WhatsApp', ok: h.hasWhatsApp, icon: '💬', detail: h.hasWhatsApp ? 'token موجود' : 'لم يُضف بعد' },
     { name: 'تيليجرام', nameEn: 'Telegram', ok: h.hasTelegram, icon: '📱', detail: h.hasTelegram ? 'token موجود' : 'لم يُضف بعد' },
