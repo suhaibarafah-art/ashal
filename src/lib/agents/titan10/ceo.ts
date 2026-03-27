@@ -97,7 +97,7 @@ export async function runCEO(): Promise<{ published: number; errors: number }> {
       published++;
     } catch (err) {
       errors++;
-      await notifyCritical('CEO/publish', item.titleEn, err);
+      await sendTelegramAlert('CRITICAL', `CEO/publish خطأ: ${item.titleEn ?? 'unknown'} — ${String(err)}`);
       await prisma.agentTaskQueue.update({
         where: { id: item.id },
         data: { errorLog: String(err) },

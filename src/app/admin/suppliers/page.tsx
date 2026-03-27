@@ -16,10 +16,11 @@ const SUPPLIER_INFO: Record<string, { nameAr: string; logo: string; color: strin
 };
 
 export default async function SuppliersPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [suppliers, productsBySupplier] = await Promise.all([
-    prisma.supplier.findMany({ orderBy: { createdAt: 'desc' } }).catch(() => []),
+    (prisma as unknown as any).supplier.findMany({ orderBy: { createdAt: 'desc' } }).catch(() => []),
     prisma.product.groupBy({ by: ['supplier'], _count: { id: true } }).catch(() => []),
-  ]);
+  ]) as [Record<string, string>[], { supplier: string; _count: { id: number } }[]];
 
   const productCountMap: Record<string, number> = {};
   for (const row of productsBySupplier) {
