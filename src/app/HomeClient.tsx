@@ -76,13 +76,13 @@ export default function HomeClient({ products }: HomeClientProps) {
         </motion.div>
 
         <motion.div style={{ opacity: opacityHero }} className="relative z-10 container flex flex-col items-start justify-center py-24">
-          <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="flex items-center gap-3 mb-6">
+          <motion.div initial={{ opacity: 0, y: -16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="flex items-center gap-3 mb-6">
             <span className="badge-mustard">جديد 2026</span>
             <span className="text-[12px] font-semibold tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.75)', fontFamily: 'var(--font-montserrat)' }}>New Collection</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.25 }}
+            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0 }} transition={{ duration: 0.9, delay: 0.25 }}
             className="text-5xl md:text-7xl lg:text-[90px] font-black leading-none mb-6"
             style={{ color: '#FFFFFF', fontFamily: 'var(--font-cairo)', letterSpacing: '-0.03em', maxWidth: '700px' }}
           >
@@ -92,14 +92,14 @@ export default function HomeClient({ products }: HomeClientProps) {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.45 }}
+            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0 }} transition={{ duration: 0.8, delay: 0.45 }}
             className="text-[16px] font-medium mb-10 max-w-md leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-cairo)' }}
           >
             أجود المنتجات، توصيل سريع من المستودع السعودي، وأسعار تنافسية لا تُعرض في أي مكان آخر.
           </motion.p>
 
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.65 }} className="flex flex-wrap gap-4">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0 }} transition={{ duration: 0.7, delay: 0.65 }} className="flex flex-wrap gap-4">
             <a href="#collection">
               <button className="btn-primary text-[16px] px-8 py-4">
                 تسوق الآن
@@ -113,7 +113,7 @@ export default function HomeClient({ products }: HomeClientProps) {
             </Link>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} className="mt-8 flex items-center gap-3 flex-wrap">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, amount: 0 }} transition={{ delay: 0.8 }} className="mt-8 flex items-center gap-3 flex-wrap">
             <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-cairo)' }}>كود الخصم:</span>
             <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>LUXURY10</span>
             <span className="coupon-badge" style={{ background: 'rgba(255,219,88,0.18)', borderColor: '#FFDB58', color: '#FFDB58' }}>SAVE10</span>
