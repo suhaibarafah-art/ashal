@@ -232,7 +232,7 @@ export async function GET(req: import('next/server').NextRequest) {
   const masterStart = Date.now();
   const results: Record<string, unknown> = {};
   const hourUTC = new Date().getUTCHours();
-  const isMorning = hourUTC === 6; // 06:00 UTC = 09:00 KSA
+  const isMorning = hourUTC >= 6 && hourUTC <= 10; // 06-10 UTC covers both schedule variants
   const buildTag = 'v2-surveillance'; // build marker — remove after confirming deploy
 
   if (isMorning) {
