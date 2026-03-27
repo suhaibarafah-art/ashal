@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// One-time: update all product images from Unsplash (503) to picsum.photos
+// Targeted image fix — correct mismatched product images with proper Unsplash photos
 const IMAGE_MAP: Record<string, string> = {
+  // ── 3 products with wrong images (headphones / skincare photos) ──────────
+  'Diamond Necklace':  'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=85',
+  'Luxury High Heel':  'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=800&q=85',
+  'Classic Leather Bag': 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=85',
+  // ── legacy empire-seed products (keep using picsum) ─────────────────────
   'Elite Oud Diffuser':              'https://picsum.photos/seed/oud-diffuser/600/600',
   'Smart Prayer Wall Clock':          'https://picsum.photos/seed/prayer-clock/600/600',
   'Gold-Leaf Coffee Set':             'https://picsum.photos/seed/gold-coffee/600/600',
@@ -30,16 +35,12 @@ export async function POST() {
   let updated = 0;
 
   for (const p of products) {
-    const newImg = IMAGE_MAP[p.titleEn];
+    const newImg = IMAGE_MAP[p.titleEn ?? ''];
     if (newImg) {
       await prisma.product.update({ where: { id: p.id }, data: { imageUrl: newImg } });
       updated++;
-    } else {
-      // Fallback: deterministic picsum by id
-      const seed = p.id.slice(0, 8);
-      await prisma.product.update({ where: { id: p.id }, data: { imageUrl: `https://picsum.photos/seed/${seed}/600/600` } });
-      updated++;
     }
+    // Skip products not in IMAGE_MAP — don't overwrite valid existing images
   }
 
   return NextResponse.json({ success: true, updated, total: products.length });
