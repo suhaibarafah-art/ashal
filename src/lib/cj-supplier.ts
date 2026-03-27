@@ -46,15 +46,17 @@ async function getCJToken(): Promise<string | null> {
     return _cachedToken;
   }
 
-  // 3. Re-auth via CJ_API_KEY (email/password)
-  const apiKey = process.env.CJ_API_KEY;
-  if (!apiKey || apiKey.startsWith('your_')) return null;
+  // 3. Re-auth via CJ_EMAIL + CJ_API_KEY
+  const email  = process.env.CJ_EMAIL ?? '';
+  const rawKey = process.env.CJ_API_KEY ?? '';
+  const apiKey = rawKey.includes('@api@') ? rawKey.split('@api@')[1] : rawKey;
+  if (!email || !apiKey || email.startsWith('your_')) return null;
 
   try {
     const res = await fetch(`${CJ_BASE}/authentication/getAccessToken`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: apiKey.split('@')[0], password: apiKey }),
+      body: JSON.stringify({ email, apiKey }),
     });
 
     if (!res.ok) throw new Error(`CJ auth HTTP ${res.status}`);
