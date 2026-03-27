@@ -111,8 +111,11 @@ export default function CollectionsClient({ products }: { products: Product[] })
                       {product.descAr}
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="price-tag">SAR {product.finalPrice.toLocaleString('ar-SA')}</span>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-blue)', fontFamily: 'var(--font-montserrat)' }}>تفاصيل ←</span>
+                      <span className="price-tag">SAR {product.finalPrice.toLocaleString('en-US')}</span>
+                      <span className="text-[11px] font-bold flex items-center gap-1" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-cairo)' }}>
+                        تفاصيل
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: 'scaleX(-1)' }}><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                      </span>
                     </div>
                   </div>
                 </div>

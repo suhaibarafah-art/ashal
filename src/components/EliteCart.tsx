@@ -12,15 +12,14 @@ export default function EliteCart({ isOpen, onClose }: { isOpen: boolean, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end">
+    <div className="fixed inset-0 z-[100] flex justify-start">
+      {/* Panel — slides in from right (START side in RTL) */}
+      <div className="relative w-full max-w-md bg-[#080808] border-e border-white/5 p-12 flex flex-col h-full shadow-2xl" style={{ animation: 'slideInRight 0.4s cubic-bezier(0.16,1,0.3,1)' }}>
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm -z-10"
         onClick={onClose}
       />
-      
-      {/* Panel */}
-      <div className="relative w-full max-w-md bg-[#080808] border-l border-white/5 p-12 flex flex-col h-full animate-slide-left shadow-2xl">
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-[10px] uppercase tracking-[0.5em] text-[#b38b4d]">سلة المقتنيات</h2>
           <button onClick={onClose} className="text-white/40 hover:text-white text-xs">CLOSE</button>
@@ -58,6 +57,12 @@ export default function EliteCart({ isOpen, onClose }: { isOpen: boolean, onClos
           <p className="text-[8px] text-center text-gray-600 uppercase tracking-widest">ZATCA COMPLIANT • SECURE CHECKOUT</p>
         </div>
       </div>
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(-100%); }
+          to   { transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
