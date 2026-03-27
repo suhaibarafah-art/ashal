@@ -26,18 +26,17 @@ async function getDBToken(): Promise<string | null> {
   try {
     const row = await prisma.siteSetting.findUnique({ where: { key: 'cj_access_token' } });
     if (!row) return null;
-    // Try JSON format first
+    // Try JSON format first: { token, expiresAt }
     try {
       const parsed = JSON.parse(row.value) as { token?: string; expiresAt?: string };
       if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) {
-        return extractJWT(parsed.token);
+        return parsed.token; // return full token as-is (CJ needs the API@...@CJ: prefix)
       }
     } catch {
       // Raw string format — check cj_token_expiry
       const expRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
-      const rawToken = extractJWT(row.value);
-      if (expRow && new Date(expRow.value) > new Date()) return rawToken;
-      if (!expRow && rawToken.length > 10) return rawToken;
+      if (expRow && new Date(expRow.value) > new Date()) return row.value;
+      if (!expRow && row.value && row.value.length > 10) return row.value;
     }
   } catch { /* DB unavailable */ }
   return null;
