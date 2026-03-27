@@ -115,6 +115,47 @@ async function runEmpireEngine(): Promise<{ adjustments: number; whiteLabelAlert
   return { adjustments, whiteLabelAlerts };
 }
 
+// ─── CJ Token Auto-Refresh ───────────────────────────────────────────────────
+// Runs daily — refreshes the CJ bearer token if it expires within 7 days
+
+async function refreshCJTokenIfNeeded(): Promise<string> {
+  try {
+    const expiryRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
+    if (expiryRow) {
+      const msLeft = new Date(expiryRow.value).getTime() - Date.now();
+      const daysLeft = msLeft / 86_400_000;
+      if (daysLeft > 7) return `ok (${daysLeft.toFixed(0)}d left)`;
+    }
+
+    // Token expires soon — try to re-auth with CJ_EMAIL + CJ_API_KEY
+    const email  = process.env.CJ_EMAIL;
+    const apiKey = process.env.CJ_API_KEY;
+    if (!email || !apiKey) return 'skip (no CJ_EMAIL/CJ_API_KEY)';
+
+    const res = await fetch('https://developers.cjdropshipping.com/api2.0/v1/authentication/getAccessToken', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: apiKey }),
+    });
+    const data = await res.json() as { code?: number; result?: { accessToken?: string; accessTokenExpiryDate?: string } };
+
+    if (data.code === 200 && data.result?.accessToken) {
+      const token = data.result.accessToken;
+      const expiresAt = data.result.accessTokenExpiryDate ?? new Date(Date.now() + 14 * 86_400_000).toISOString();
+      await Promise.all([
+        prisma.siteSetting.upsert({ where: { key: 'cj_access_token' }, create: { key: 'cj_access_token', value: token }, update: { value: token } }),
+        prisma.siteSetting.upsert({ where: { key: 'cj_token_expiry' }, create: { key: 'cj_token_expiry', value: expiresAt }, update: { value: expiresAt } }),
+      ]);
+      await prisma.systemLog.create({ data: { level: 'SUCCESS', source: 'cron/cj-refresh', message: `CJ token refreshed — expires ${expiresAt}` } }).catch(() => {});
+      return `refreshed (expires ${expiresAt})`;
+    }
+    await prisma.systemLog.create({ data: { level: 'WARN', source: 'cron/cj-refresh', message: `CJ token refresh failed: code=${data.code}` } }).catch(() => {});
+    return `failed (code=${data.code})`;
+  } catch (e) {
+    return `error: ${String(e)}`;
+  }
+}
+
 // ─── 0. Order Lifecycle Automation ───────────────────────────────────────────
 // Runs before everything else — fixes stuck orders & progresses statuses automatically
 
@@ -240,7 +281,14 @@ export async function GET(req: import('next/server').NextRequest) {
     // FULL_PIPELINE — runs once daily at 06:00 UTC
     // ═══════════════════════════════════════════════════════
 
-    // 0. Order lifecycle automation (fixes stuck orders)
+    // 0a. CJ token auto-refresh
+    try {
+      results.cjRefresh = await refreshCJTokenIfNeeded();
+    } catch (e) {
+      results.cjRefresh = String(e);
+    }
+
+    // 0b. Order lifecycle automation (fixes stuck orders)
     try {
       results.orderLifecycle = await runOrderLifecycle();
     } catch (e) {
