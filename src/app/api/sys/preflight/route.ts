@@ -39,12 +39,12 @@ export async function GET(req: NextRequest) {
       results.errors.push(`Supplier (non-critical): ${String(e)}`);
     }
 
-    // 2. Moyasar (required for payments)
-    const moyasarKey = process.env.MOYASAR_SECRET_KEY ?? '';
+    // 2. Moyasar (required for payments) — supports both env var names
+    const moyasarKey = process.env.MOYASAR_SECRET_KEY ?? process.env.MOYASAR_API_KEY ?? '';
     results.payment.configured = !!moyasarKey && moyasarKey !== 'PENDING' && !moyasarKey.startsWith('sk_test_MISSING');
     results.payment.note = results.payment.configured ? 'Live key present' : 'Key missing or placeholder';
     if (!results.payment.configured) {
-      results.errors.push('Payment: MOYASAR_SECRET_KEY not configured');
+      results.errors.push('Payment: MOYASAR_API_KEY not configured');
     }
 
     const isReady = results.payment.configured; // supplier is optional

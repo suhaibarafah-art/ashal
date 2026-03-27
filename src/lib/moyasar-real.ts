@@ -35,4 +35,4 @@ export class MoyasarPaymentCore {
   }
 }
 
-export const moyasarCore = new MoyasarPaymentCore(process.env.MOYASAR_SECRET_KEY || "PENDING");
+export const moyasarCore = new MoyasarPaymentCore(process.env.MOYASAR_SECRET_KEY ?? process.env.MOYASAR_API_KEY ?? "PENDING");
