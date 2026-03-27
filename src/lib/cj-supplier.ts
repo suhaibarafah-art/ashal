@@ -1,7 +1,12 @@
 /**
  * Saudi Luxury Store - CJ Dropshipping API Wrapper
- * Proper OAuth flow: API key → Bearer token → API calls
+ * Token priority:
+ *   1. Module-level cache (in-memory, ~23h)
+ *   2. Neon DB key cj_access_token (set via /api/sys/cj-token)
+ *   3. CJ_API_KEY env var (email/password re-auth)
  */
+
+import { prisma } from '@/lib/prisma';
 
 const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
 
@@ -9,12 +14,41 @@ const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
 let _cachedToken: string | null = null;
 let _tokenExpiry: number = 0;
 
+/** Read the bearer token stored in Neon DB via /api/sys/cj-token */
+async function getDBToken(): Promise<string | null> {
+  try {
+    const row = await prisma.siteSetting.findUnique({ where: { key: 'cj_access_token' } });
+    if (!row) return null;
+    // Try JSON format first
+    try {
+      const parsed = JSON.parse(row.value) as { token?: string; expiresAt?: string };
+      if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) return parsed.token;
+    } catch {
+      // Raw string format — check cj_token_expiry
+      const expRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
+      if (expRow && new Date(expRow.value) > new Date()) return row.value;
+      if (!expRow && row.value.length > 10) return row.value;
+    }
+  } catch { /* DB unavailable */ }
+  return null;
+}
+
 async function getCJToken(): Promise<string | null> {
+  // 1. In-memory cache
+  if (_cachedToken && Date.now() < _tokenExpiry) return _cachedToken;
+
+  // 2. DB token (pre-stored bearer token)
+  const dbToken = await getDBToken();
+  if (dbToken) {
+    _cachedToken = dbToken;
+    _tokenExpiry = Date.now() + 20 * 3_600_000; // cache for 20h
+    console.log('[CJ] Token loaded from DB');
+    return _cachedToken;
+  }
+
+  // 3. Re-auth via CJ_API_KEY (email/password)
   const apiKey = process.env.CJ_API_KEY;
   if (!apiKey || apiKey.startsWith('your_')) return null;
-
-  // Return cached token if still valid
-  if (_cachedToken && Date.now() < _tokenExpiry) return _cachedToken;
 
   try {
     const res = await fetch(`${CJ_BASE}/authentication/getAccessToken`, {
@@ -28,11 +62,10 @@ async function getCJToken(): Promise<string | null> {
 
     if (data.code === 200 && data.result?.accessToken) {
       _cachedToken = data.result.accessToken;
-      // Expire 1h before actual expiry for safety
       _tokenExpiry = data.result.accessTokenExpiryDate
         ? new Date(data.result.accessTokenExpiryDate).getTime() - 3_600_000
         : Date.now() + 22 * 3_600_000;
-      console.log('[CJ] Token obtained successfully');
+      console.log('[CJ] Token obtained via re-auth');
       return _cachedToken;
     }
   } catch (e) {
