@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductActions } from './ProductActions';
+import { ProductImage } from './ProductImage';
 import type { Metadata } from 'next';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://saudilux.store';
@@ -74,23 +75,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
           {/* ── Image ── */}
           <div>
-            <div
-              className="w-full rounded-xl overflow-hidden"
-              style={{ aspectRatio: '1/1', background: 'var(--bg-tertiary)', boxShadow: 'var(--shadow-card)', position: 'relative' }}
-            >
-              <img
-                src={imageUrl}
-                alt={product.titleAr}
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
-              {/* Sold badge */}
-              <div style={{ position: 'absolute', top: '14px', right: '14px', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '4px 12px' }}>
-                <span style={{ color: 'white', fontFamily: 'var(--font-cairo)', fontSize: '12px', fontWeight: 700 }}>
-                  🔥 {soldCount}+ مبيعة
-                </span>
-              </div>
-            </div>
+            <ProductImage src={imageUrl} alt={product.titleAr} soldCount={soldCount} />
           </div>
 
           {/* ── Product Info ── */}

@@ -39,7 +39,7 @@ export default function AiAssistant() {
         style={{
           position: 'fixed',
           bottom: '2rem',
-          left: '2rem',
+          right: '2rem',
           width: '60px',
           height: '60px',
           borderRadius: '50%',
@@ -64,17 +64,17 @@ export default function AiAssistant() {
         <div style={{
           position: 'fixed',
           top: 0,
-          left: 0,
+          right: 0,
           width: '400px',
           height: '100vh',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(10px)',
-          borderRight: '1px solid var(--border-color)',
+          borderLeft: '1px solid var(--border-color)',
           zIndex: 999,
           padding: '2rem',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '20px 0 50px rgba(0,0,0,0.5)',
+          boxShadow: '-20px 0 50px rgba(0,0,0,0.5)',
           animation: 'slideIn 0.5s ease-out'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -129,7 +129,7 @@ export default function AiAssistant() {
 
       <style jsx>{`
         @keyframes slideIn {
-          from { transform: translateX(-100%); }
+          from { transform: translateX(100%); }
           to { transform: translateX(0); }
         }
       `}</style>
