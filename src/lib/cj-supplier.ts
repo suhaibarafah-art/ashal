@@ -14,6 +14,13 @@ const CJ_BASE = 'https://developers.cjdropshipping.com/api2.0/v1';
 let _cachedToken: string | null = null;
 let _tokenExpiry: number = 0;
 
+/** Extract the pure JWT from a raw token value (handles prefix format API@...@CJ:{jwt}) */
+function extractJWT(raw: string): string {
+  // If token contains 'eyJ' (base64 JSON header), extract from that point
+  const jwtStart = raw.indexOf('eyJ');
+  return jwtStart > 0 ? raw.slice(jwtStart) : raw;
+}
+
 /** Read the bearer token stored in Neon DB via /api/sys/cj-token */
 async function getDBToken(): Promise<string | null> {
   try {
@@ -22,12 +29,15 @@ async function getDBToken(): Promise<string | null> {
     // Try JSON format first
     try {
       const parsed = JSON.parse(row.value) as { token?: string; expiresAt?: string };
-      if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) return parsed.token;
+      if (parsed.token && parsed.expiresAt && new Date(parsed.expiresAt) > new Date()) {
+        return extractJWT(parsed.token);
+      }
     } catch {
       // Raw string format — check cj_token_expiry
       const expRow = await prisma.siteSetting.findUnique({ where: { key: 'cj_token_expiry' } });
-      if (expRow && new Date(expRow.value) > new Date()) return row.value;
-      if (!expRow && row.value.length > 10) return row.value;
+      const rawToken = extractJWT(row.value);
+      if (expRow && new Date(expRow.value) > new Date()) return rawToken;
+      if (!expRow && rawToken.length > 10) return rawToken;
     }
   } catch { /* DB unavailable */ }
   return null;
