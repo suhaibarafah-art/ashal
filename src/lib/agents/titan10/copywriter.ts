@@ -7,7 +7,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { notifyCritical } from './ceo';
+import { notifyCritical } from './alerts';
 
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
 

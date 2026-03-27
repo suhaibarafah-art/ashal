@@ -8,7 +8,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendTelegramAlert } from '@/lib/telegram';
 import { calculateLuxuryPrice } from '@/lib/pricing-engine';
-import { detectCategory } from './copywriter';
+import { detectCategory } from './category';
 
 export async function runCEO(): Promise<{ published: number; errors: number }> {
   let published = 0;
@@ -108,19 +108,5 @@ export async function runCEO(): Promise<{ published: number; errors: number }> {
   return { published, errors };
 }
 
-// ─── CRITICAL error broadcaster — called by any agent on failure ─────────────
-export async function notifyCritical(source: string, context: string, err: unknown): Promise<void> {
-  const msg = `🚨 CRITICAL — ${source}\n\nالسياق: ${context}\nالخطأ: ${String(err).slice(0, 200)}\n\nتحقق من السجلات فوراً.`;
-
-  await Promise.allSettled([
-    sendTelegramAlert('CRITICAL', msg),
-    prisma.systemLog.create({
-      data: {
-        level: 'ERROR',
-        source: `agent/${source.toLowerCase().replace(/\//g, '-')}`,
-        message: `CRITICAL: ${context} — ${String(err).slice(0, 300)}`,
-        metadata: JSON.stringify({ source, context }),
-      },
-    }),
-  ]);
-}
+// re-export for backward compat — actual impl lives in alerts.ts
+export { notifyCritical } from './alerts';
