@@ -98,8 +98,9 @@ export default function ContactPage() {
         </div>
 
         <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <Link href="/" style={{ fontFamily: 'var(--font-cairo)', color: 'var(--color-blue)', fontWeight: 700, fontSize: '14px' }}>
-            ← العودة للتسوق
+          <Link href="/" className="flex items-center gap-2 justify-center" style={{ fontFamily: 'var(--font-cairo)', color: 'var(--color-blue)', fontWeight: 700, fontSize: '14px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            العودة للتسوق
           </Link>
         </div>
       </div>
