@@ -17,7 +17,7 @@ export async function GET() {
       products: productCount,
       orders: orderCount,
       env: {
-        moyasar: !!(process.env.MOYASAR_API_KEY || process.env.MOYASAR_SECRET_KEY),
+        moyasar: !!(process.env.MOYASAR_API_KEY || process.env.MOYASAR_SECRET_KEY || process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY),
         cj: !!process.env.CJ_API_KEY,
         resend: !!process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'test',
         whatsapp: !!process.env.WHATSAPP_TOKEN,

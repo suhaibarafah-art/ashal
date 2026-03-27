@@ -33,7 +33,7 @@ async function pingNeon(): Promise<PingResult> {
 async function pingMoyasar(): Promise<PingResult> {
   const start = Date.now();
   try {
-    const key = process.env.MOYASAR_SECRET_KEY ?? '';
+    const key = process.env.MOYASAR_API_KEY ?? '';
     if (!key) return { name: 'Moyasar', nameAr: 'بوابة الدفع', ok: false, latencyMs: 0, detail: 'مفتاح غير موجود' };
 
     const res = await fetch('https://api.moyasar.com/v1/payments?per_page=1', {
