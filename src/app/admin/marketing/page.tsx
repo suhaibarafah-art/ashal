@@ -68,7 +68,7 @@ export default async function MarketingPage() {
         <div className="flex items-center gap-3">
           <Link href="/admin">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', fontFamily: 'var(--font-cairo)', cursor: 'pointer', border: 'none' }}>
-              ← لوحة القيادة
+              ⟨ لوحة القيادة
             </button>
           </Link>
         </div>

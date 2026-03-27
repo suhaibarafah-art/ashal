@@ -124,7 +124,7 @@ export async function POST() {
     const summary =
       `🔍 *تقرير الفحص الشامل*\n\n` +
       results.map(r => `${r.ok ? '✅' : '❌'} ${r.nameAr}: ${r.detail}`).join('\n') +
-      `\n\n🏆 *صحة النظام: ${score}/10*\n_${new Date().toLocaleString('ar-SA')}_`;
+      `\n\n🏆 *صحة النظام: ${score}/10*\n_${new Date().toLocaleString('en-US')}_`;
 
     await sendTelegramAlert('SUCCESS', summary).catch(() => null);
   }

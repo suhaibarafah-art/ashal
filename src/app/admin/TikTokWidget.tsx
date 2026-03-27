@@ -199,7 +199,7 @@ export function TikTokWidget() {
         </div>
         <a href="/admin/marketing">
           <span className="text-[11px] font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(232,118,26,0.15)', color: '#FF8C00', border: '1px solid rgba(232,118,26,0.4)', cursor: 'pointer', fontFamily: 'var(--font-cairo)' }}>
-            محور التسويق ←
+            محور التسويق ⟩
           </span>
         </a>
       </div>

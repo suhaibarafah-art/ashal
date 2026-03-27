@@ -392,7 +392,7 @@ export default async function AdminPage() {
               </div>
             )}
             <div className="mt-4">
-              <Link href="/admin/system-logs" className="text-[13px] font-bold" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-cairo)' }}>عرض كل السجلات ←</Link>
+              <Link href="/admin/system-logs" className="flex items-center gap-1 text-[13px] font-bold" style={{ color: 'var(--color-blue)', fontFamily: 'var(--font-cairo)' }}>عرض كل السجلات <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: 'scaleX(-1)' }}><path d="M5 12h14M12 5l7 7-7 7"/></svg></Link>
             </div>
           </div>
         </div>

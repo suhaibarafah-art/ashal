@@ -296,7 +296,7 @@ export default async function WarRoomPage() {
           )}
           <div style={{ marginTop: '16px' }}>
             <Link href="/admin" style={{ fontFamily: 'var(--font-cairo)', color: 'var(--color-blue)', fontWeight: 700, fontSize: '13px' }}>
-              عرض كل الطلبات ←
+              عرض كل الطلبات ⟩
             </Link>
           </div>
         </div>

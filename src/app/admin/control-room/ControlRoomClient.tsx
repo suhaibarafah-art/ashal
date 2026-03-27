@@ -249,7 +249,7 @@ export default function ControlRoomClient({ statusData, heartbeatLogs }: Control
         <div>
           <div className="flex items-center gap-3">
             <Link href="/admin" className="text-[12px] font-bold" style={{ color: 'rgba(144,202,249,0.6)', fontFamily: 'var(--font-montserrat)' }}>
-              ← مركز القيادة
+              ⟨ مركز القيادة
             </Link>
             <span style={{ color: 'rgba(144,202,249,0.3)' }}>/</span>
             <span className="text-[12px] font-bold" style={{ color: 'rgba(144,202,249,0.6)', fontFamily: 'var(--font-montserrat)' }}>

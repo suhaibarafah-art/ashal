@@ -114,7 +114,7 @@ export default async function AgentsPage() {
                     {agent.log ? (
                       <div style={{ background: bgColor, borderRadius: '6px', padding: '6px 8px' }}>
                         <p style={{ fontFamily: 'var(--font-montserrat)', fontSize: '10px', color: 'var(--text-muted)', margin: 0 }}>
-                          {new Date(agent.log.createdAt).toLocaleString('ar-SA')}
+                          {new Date(agent.log.createdAt).toLocaleString('en-US')}
                         </p>
                         <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '11px', color: agent.status === 'error' ? '#f87171' : 'var(--text-secondary)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {agent.log.message}
@@ -134,7 +134,7 @@ export default async function AgentsPage() {
         <div style={{ marginTop: '32px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' }}>
           <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: '14px', color: 'var(--text-primary)', margin: 0 }}>📋 آخر سجلات الوكلاء</h3>
-            <Link href="/admin/system-logs" style={{ fontFamily: 'var(--font-cairo)', fontSize: '12px', color: '#FF8C00', textDecoration: 'none' }}>عرض الكل ←</Link>
+            <Link href="/admin/system-logs" className="flex items-center gap-1" style={{ fontFamily: 'var(--font-cairo)', fontSize: '12px', color: '#FF8C00', textDecoration: 'none' }}>عرض الكل <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: 'scaleX(-1)' }}><path d="M5 12h14M12 5l7 7-7 7"/></svg></Link>
           </div>
           {logs.slice(0, 8).map((log, i) => (
             <div key={log.id} style={{ padding: '10px 20px', borderBottom: i < 7 ? '1px solid var(--border-color)' : 'none', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>

@@ -93,7 +93,7 @@ export default function LiveMonitor() {
             ↻ تحديث
           </button>
           <Link href="/admin" className="text-[9px] text-gray-500 hover:text-gray-300">
-            ← Admin
+            ⟨ Admin
           </Link>
         </div>
       </div>

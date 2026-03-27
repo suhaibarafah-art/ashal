@@ -73,7 +73,7 @@ export default async function AdminOrdersPage({
         <div className="flex items-center gap-4">
           <Link href="/admin">
             <button className="px-4 py-2 rounded-md font-bold text-[13px]" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', fontFamily: 'var(--font-cairo)', cursor: 'pointer', border: 'none' }}>
-              ← لوحة التحكم
+              ⟨ لوحة التحكم
             </button>
           </Link>
         </div>

@@ -95,13 +95,13 @@ export default async function SystemHealthPage() {
           <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '16px' }}>
             <h3 style={{ fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 8px' }}>⏰ آخر تشغيل Cron</h3>
             <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', color: 'var(--text-primary)', margin: 0 }}>
-              {h.lastCron ? new Date(h.lastCron.createdAt).toLocaleString('ar-SA') : 'لم يعمل بعد'}
+              {h.lastCron ? new Date(h.lastCron.createdAt).toLocaleString('en-US') : 'لم يعمل بعد'}
             </p>
           </div>
           <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '16px' }}>
             <h3 style={{ fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 8px' }}>🤖 آخر تشغيل TITAN</h3>
             <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '13px', color: 'var(--text-primary)', margin: 0 }}>
-              {h.lastTitan ? new Date(h.lastTitan.createdAt).toLocaleString('ar-SA') : 'لم يعمل بعد'}
+              {h.lastTitan ? new Date(h.lastTitan.createdAt).toLocaleString('en-US') : 'لم يعمل بعد'}
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default async function SystemHealthPage() {
             <h3 style={{ fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: '14px', color: '#f87171', margin: '0 0 12px' }}>⚠️ آخر الأخطاء</h3>
             {h.errors.map(e => (
               <div key={e.id} style={{ padding: '8px 0', borderBottom: '1px solid #dc262622' }}>
-                <p style={{ fontFamily: 'var(--font-montserrat)', fontSize: '10px', color: '#9ca3af', margin: '0 0 2px' }}>{e.source} — {new Date(e.createdAt).toLocaleString('ar-SA')}</p>
+                <p style={{ fontFamily: 'var(--font-montserrat)', fontSize: '10px', color: '#9ca3af', margin: '0 0 2px' }}>{e.source} — {new Date(e.createdAt).toLocaleString('en-US')}</p>
                 <p style={{ fontFamily: 'var(--font-cairo)', fontSize: '12px', color: '#f87171', margin: 0 }}>{e.message}</p>
               </div>
             ))}
