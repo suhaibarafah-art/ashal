@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { addToCart } from '@/lib/cart';
 
 interface Props {
   productId: string;
+  titleAr: string;
+  imageUrl: string;
   finalPrice: number;
 }
 
-export function ProductActions({ productId, finalPrice }: Props) {
+export function ProductActions({ productId, titleAr, imageUrl, finalPrice }: Props) {
   const router = useRouter();
   const [coupon, setCoupon] = useState('');
   const [validating, setValidating] = useState(false);
@@ -87,8 +90,12 @@ export function ProductActions({ productId, finalPrice }: Props) {
         اطلب الآن — SAR {finalPrice.toLocaleString('en-US')}
       </button>
 
-      <button className="btn-secondary w-full text-[15px] py-4" style={{ fontFamily: 'var(--font-cairo)' }}>
-        أضف للمفضلة ♡
+      <button
+        onClick={() => addToCart({ productId, titleAr, imageUrl, finalPrice })}
+        className="btn-secondary w-full text-[15px] py-4"
+        style={{ fontFamily: 'var(--font-cairo)' }}
+      >
+        أضف للسلة 🛍️
       </button>
     </div>
   );

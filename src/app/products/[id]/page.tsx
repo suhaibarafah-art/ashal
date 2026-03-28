@@ -190,7 +190,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Coupon field — functional GET form → passes ?coupon= to checkout */}
-            <ProductActions productId={product.id} finalPrice={product.finalPrice} />
+            <ProductActions productId={product.id} titleAr={product.titleAr} imageUrl={imageUrl} finalPrice={product.finalPrice} />
           </div>
         </div>
 

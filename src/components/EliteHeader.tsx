@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import EliteCart from './EliteCart';
 import ThemeToggle from './ThemeToggle';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { cartCount, getCart } from '@/lib/cart';
 
 /**
  * EliteHeader — Deep Royal Blue Navigation + Strategic Orange CTA
@@ -18,6 +19,14 @@ export default function EliteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const sync = () => setCount(cartCount(getCart()));
+    sync();
+    window.addEventListener('cart-updated', sync);
+    return () => window.removeEventListener('cart-updated', sync);
+  }, []);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest: number) => {
@@ -114,7 +123,7 @@ export default function EliteHeader() {
             {/* Cart — Orange CTA */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all hover:opacity-90 active:scale-95"
+              className="relative flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-[14px] transition-all hover:opacity-90 active:scale-95"
               style={{
                 background: '#FF8C00',
                 color: 'white',
@@ -128,6 +137,14 @@ export default function EliteHeader() {
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
               السلة
+              {count > 0 && (
+                <span
+                  className="absolute -top-1.5 -end-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black"
+                  style={{ background: '#002366', color: '#FFDB58', fontFamily: 'var(--font-montserrat)' }}
+                >
+                  {count}
+                </span>
+              )}
             </button>
           </div>
         </div>
